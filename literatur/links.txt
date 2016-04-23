@@ -1,1 +1,37 @@
-https://www.sha.rub.de/media/attachments/files/2014/06/bliss_arm.pdf
+### Postquantum Cryptography
+
+Standardisation:
+http://csrc.nist.gov/publications/drafts/nistir-8105/nistir_8105_draft.pdf
+
+### Side-Channel Attacks
+
+Terminologie:
+- http://download.springer.com/static/pdf/803/chp%253A10.1007%252F978-3-642-04138-9_7.pdf?originUrl=http%3A%2F%2Flink.springer.com%2Fchapter%2F10.1007%2F978-3-642-04138-9_7&token2=exp=1461428105~acl=%2Fstatic%2Fpdf%2F803%2Fchp%25253A10.1007%25252F978-3-642-04138-9_7.pdf%3ForiginUrl%3Dhttp%253A%252F%252Flink.springer.com%252Fchapter%252F10.1007%252F978-3-642-04138-9_7*~hmac=3f735395dd33415a37aba39dc0d4bb2b066430c363cda8798ec4db9f44b282ab
+
+Differential Power Analysis:
+- https://www.cis.upenn.edu/~nadiah/courses/cis800-02-f13/readings/kocher-jaffe-jun.pdf
+- https://choucroutage.com/Papers/SideChannelAttacks/issc-2008-tunstall.pdf
+
+### Lattice-Based Cryptography
+
+Ring-LWE:
+- http://www.di.ens.fr/~lyubash/papers/ringLWE.pdf
+- https://www.ei.rub.de/media/sh/veroeffentlichungen/2013/08/14/lwe_encrypt.pdf
+- http://www.iacr.org/archive/ches2012/74280511/74280511.pdf
+
+Ring-LWE - Masking:
+* https://eprint.iacr.org/2015/724.pdf
+- https://securewww.esat.kuleuven.be/cosic/publications/article-2633.pdf
+
+Ring-LWE - Blinding:
+* https://eprint.iacr.org/2016/276.pdf
+
+Bliss:
+- https://eprint.iacr.org/2013/383.pdf
+- https://www.sha.rub.de/media/attachments/files/2014/06/bliss_arm.pdf
+
+Bliss - Attack:
+* https://eprint.iacr.org/2016/300.pdf
+
+Rejection Sampling:
+- http://www.di.ens.fr/~lyubash/papers/idlatticeconf.pdf
