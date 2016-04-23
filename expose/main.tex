@@ -1,0 +1,32 @@
+% *************************************************************
+% ENTER INFORMATION ABOUT AUTHOR, TITLE and TYPE HERE
+\newcommand{\thauthor}{Julian Speith, Felix Haarmann}
+\newcommand{\thtitle}{Side-Channel Attacks on Implementations of Lattice-based Cryptosystems}
+% *************************************************************
+
+\documentclass[a4paper,12pt,twoside,openany,headsepline,bibliography=totocnumbered]{scrbook}
+
+% Import settings, packages, etc.
+\input{settings}
+
+\begin{document}
+
+% Import frontpage
+\input{frontpage}
+
+%
+% Include all your chapters as .tex files, each file contains sections \section{name of section},
+% subsections \subsections{...} and so on...
+%
+
+\pagenumbering{arabic} 
+
+\input{summary}
+
+% Generate bibliography with bibtex, the bibfile here is "bibliography.bib", use alphanumerical style
+\begin{appendix}
+ \bibliography{bibliography}
+ \bibliographystyle{alpha}
+\end{appendix}
+
+\end{document} 
