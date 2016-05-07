@@ -12,6 +12,12 @@ Differential Power Analysis:
 - https://www.cis.upenn.edu/~nadiah/courses/cis800-02-f13/readings/kocher-jaffe-jun.pdf
 - https://choucroutage.com/Papers/SideChannelAttacks/issc-2008-tunstall.pdf
 
+### Masking
+
+Sharing a Secret:
+- http://cs.jhu.edu/~sdoshi/crypto/papers/shamirturing.pdf
+- http://link.springer.com/chapter/10.1007/3-540-48405-1_26
+
 ### Lattice-Based Cryptography
 
 Ring-LWE:
