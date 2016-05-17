@@ -1,0 +1,86 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{RdCR{\etalchar{+}}16}
+
+\bibitem[BHLY16]{cryptoeprint:2016:300}
+Leon~Groot Bruinderink, Andreas Hülsing, Tanja Lange, and Yuval Yarom.
+\newblock Flush, gauss, and reload -- a cache attack on the bliss lattice-based
+  signature scheme.
+\newblock Cryptology ePrint Archive, Report 2016/300, 2016.
+
+\bibitem[CJL{\etalchar{+}}16]{Nist}
+Lily Chen, Stephen Jordan, Yi-Kai Liu, Dustin Moody, Rene Peralta, Ray Perlner,
+  and Daniel Smith-Tone.
+\newblock Report on post-quantum cryptography.
+\newblock Technical Report NIST IR 8105, National Institute of Standards and
+  Technology (NIST), February 2016.
+
+\bibitem[DDLL13]{cryptoeprint:2013:383}
+Léo Ducas, Alain Durmus, Tancrède Lepoint, and Vadim Lyubashevsky.
+\newblock Lattice signatures and bimodal gaussians.
+\newblock Cryptology ePrint Archive, Report 2013/383, 2013.
+
+\bibitem[KJJ99]{DBLP:conf/crypto/KocherJJ99}
+Paul~C. Kocher, Joshua Jaffe, and Benjamin Jun.
+\newblock Differential power analysis.
+\newblock In {\em Advances in Cryptology - {CRYPTO} '99, 19th Annual
+  International Cryptology Conference, Santa Barbara, California, USA, August
+  15-19, 1999, Proceedings}, pages 388--397, 1999.
+
+\bibitem[KJJR11]{Kocher2011}
+Paul~C. Kocher, Joshua Jaffe, Benjamin Jun, and Pankaj Rohatgi.
+\newblock Introduction to differential power analysis.
+\newblock {\em Journal of Cryptographic Engineering}, 1(1):5--27, 2011.
+
+\bibitem[LPR12]{cryptoeprint:2012:230}
+Vadim Lyubashevsky, Chris Peikert, and Oded Regev.
+\newblock On ideal lattices and learning with errors over rings.
+\newblock Cryptology ePrint Archive, Report 2012/230, 2012.
+
+\bibitem[PDG14]{cryptoeprint:2014:254}
+Thomas P\"oppelmann, L{\'e}o Ducas, and Tim G\"uneysu.
+\newblock Enhanced lattice-based signatures on reconfigurable hardware.
+\newblock Cryptology ePrint Archive, Report 2014/254, 2014.
+
+\bibitem[Pei10]{cryptoeprint:2010:088}
+Chris Peikert.
+\newblock An efficient and parallel gaussian sampler for lattices.
+\newblock Cryptology ePrint Archive, Report 2010/088, 2010.
+
+\bibitem[PG14]{Pöppelmann2014}
+Thomas P{\"o}ppelmann and Tim G{\"u}neysu.
+\newblock {\em Selected Areas in Cryptography -- SAC 2013: 20th International
+  Conference, Burnaby, BC, Canada, August 14-16, 2013, Revised Selected
+  Papers}, chapter Towards Practical Lattice-Based Public-Key Encryption on
+  Reconfigurable Hardware, pages 68--85.
+\newblock Springer Berlin Heidelberg, 2014.
+
+\bibitem[PM10]{cryptoeprint:2010:385}
+Emmanuel Prouff and Robert McEvoy.
+\newblock First-order side-channel attacks on the permutation tables
+  countermeasure –extended version–.
+\newblock Cryptology ePrint Archive, Report 2010/385, 2010.
+
+\bibitem[PRB10]{cryptoeprint:2010:646}
+Emmanuel Prouff, Matthieu Rivain, and Régis Bévan.
+\newblock Statistical analysis of second order differential power analysis.
+\newblock Cryptology ePrint Archive, Report 2010/646, 2010.
+
+\bibitem[RdCR{\etalchar{+}}16]{Reparaz2016}
+Oscar Reparaz, Ruan de~Clercq, Sujoy~Sinha Roy, Frederik Vercauteren, and
+  Ingrid Verbauwhede.
+\newblock {\em Post-Quantum Cryptography: 7th International Workshop, PQCrypto
+  2016, Fukuoka, Japan, February 24-26, 2016, Proceedings}, chapter Additively
+  Homomorphic Ring-LWE Masking, pages 233--244.
+\newblock Springer International Publishing, 2016.
+
+\bibitem[RRVV15]{maskedRing}
+Oscar Reparaz, Sujoy~Sinha Roy, Frederik Vercauteren, and Ingrid Verbauwhede.
+\newblock A masked ring-lwe implementation.
+\newblock Cryptology ePrint Archive, Report 2015/724, 2015.
+
+\bibitem[Saa16]{cryptoeprint:2016:276}
+Markku-Juhani~O. Saarinen.
+\newblock Arithmetic coding and blinding countermeasures for ring-lwe.
+\newblock Cryptology ePrint Archive, Report 2016/276, 2016.
+
+\end{thebibliography}
