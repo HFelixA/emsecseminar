@@ -14,8 +14,9 @@
 \usepackage[T1]{url}
 \usepackage{listings}
 \usepackage[printonlyused]{acronym}
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
 \usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{multicol}
 \usepackage{hyphenat}
 
@@ -25,6 +26,13 @@
 \setlength{\parskip}{1ex plus0.5ex minus0.2ex}
 % Seperation between list items
 \setlength{\itemsep}{0ex plus0.2ex}
+
+% Algorithm
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
 
 % Fancy headers
 \setlength{\headsep}{8mm}
