@@ -24,7 +24,7 @@ The discrete Gaussian distribution with mean \(\mu\) and standard deviation \(\s
 \begin{center}
 	\(\rho_\sigma(x)=\frac{1}{\sqrt{2\pi \sigma^2}}e^{-\frac{x^2}{2\sigma^2}}\)
 \end{center}
-The discrete Gaussian distribution over \(\mathbb{Z}\) is then defined as \(D_\sigma(x)=\rho_\sigma(x)/\rho_\sigma(\mathbb{Z})\) with \(\rho_\sigma(\mathbb{Z})=\sum_{y=-\infty}^{\infty} \rho_\sigma(y)\). As we will sample whole vectors most of the time, we define the discrete Gaussian distribution over \(\mathbb{Z}^m\) as \(D_\sigma^m(x)=\rho_\sigma(\textbf{x})/\rho_\sigma(\mathbb{Z})^m\) with \(\rho_\sigma(\textbf{x})\) defined as follows:
+The probability function of discrete Gaussian distribution over \(\mathbb{Z}\) is then defined as \(D_\sigma(x)=\rho_\sigma(x)/\rho_\sigma(\mathbb{Z})\) with \(\rho_\sigma(\mathbb{Z})=\sum_{y=-\infty}^{\infty} \rho_\sigma(y)\). As we will sample whole vectors most of the time, we denote the discrete Gaussian distribution over \(\mathbb{Z}^m\) as \(\mathcal{N}_\mathbb{Z}^{n} (\mu, \sigma^2)\) and its probability function as \(D_\sigma^m(\textbf{x})=\rho_\sigma(\textbf{x})/\rho_\sigma(\mathbb{Z})^m\) with \(\rho_\sigma(\textbf{x})\) being defined as follows:
 \begin{center}
 	\(\rho_\sigma(\textbf{x})=\frac{1}{\sqrt{2\pi \sigma^2}}e^{-\frac{\|\textbf{x}\|^2}{2\sigma^2}}\)
 \end{center}
