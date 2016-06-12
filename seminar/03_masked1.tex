@@ -6,9 +6,23 @@
 Since most side-channel attacks focus on the decryption operation, this section will present an attempt to masking the decryption function of the \textit{LPR} Ring-LWE encryption scheme. This masking approach was originally proposed in \cite{maskedRing}, for more details we would refer you to that paper.
 
 \section{Implementation}
-In this Section we will start by giving the reader an overview of the general setup, before going into more detail about the masked decoding algorithms.
+In this Section we will start by giving the reader an overview of the general setup, before going into more detail about the masked decoding algorithms. We will make strong use of the \textit{Number Theoretic Transform} (NTT) in this chapter. We recall, that our notation for polynomials in the NTT domain is \(\tilde{\textbf{f}}\). The NTT operation itself will be denoted as \(\textsc{NTT}(.)\), while its inverse operation will be written as \(\textsc{INTT}(.)\). We want to stress, that \(\textsc{NTT}(.)\) and \(\textsc{INTT}(.)\) are linear operations, as we will use this characteristic for our blinding technique.
 
 \subsection{Overview}
+This Subsection will give you a short overview of the blinding technique proposed in \cite{maskedRing}. We start by splitting the secret key \(\textbf{s}\) into two shares \(\textbf{s}',\textbf{s}'' \in R_q\) such that \(\textbf{s}=\textbf{s}'+\textbf{s}''\). Therefore we choose all coefficients of \(\textbf{s}'\) uniformly at random and calculate \(\textbf{s}''=\textbf{s}-\textbf{s}'\). In the NTT domain it follows, that \(\tilde{\textbf{s}}=\tilde{\textbf{s}}'+\tilde{\textbf{s}}''\). Due to the linearity of \(\textsc{INTT}(.)\) and the multiplication, we can compute \(\textbf{m}_{enc}\) as:
+\begin{equation}
+	\textbf{m}_{enc}=\textsc{INTT}(\tilde{\textbf{s}} \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2)=\textsc{INTT}(\tilde{\textbf{s}}' \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2)+\textsc{INTT}(\tilde{\textbf{s}}'' \cdot \tilde{\textbf{c}}_1)
+\end{equation}
+This enables us to split the whole equation into two branches, calculating \(\textbf{m}'_{enc}\) and \(\textbf{m}''_{enc}\) in the following way:
+\begin{equation}
+	\textbf{m}'_{enc}=\textsc{INTT}(\tilde{\textbf{s}}' \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2)
+\end{equation}
+\begin{equation}
+	\textbf{m}''_{enc}=\textsc{INTT}(\tilde{\textbf{s}}'' \cdot \tilde{\textbf{c}}_1)
+\end{equation}
+Those computations can be done on a arithmetic processor without any protection against side-channel attacks like \textit{DPA}, as both branches are totally independent of our secret key \(\textbf{s}\).\\
+However, the \(\textsc{Decode}(m_{enc,i})\) function in the decryption stage of the \textit{LPR} scheme is non-linear and cannot easily be split into two parts. For this reason, we will present a masked decoder in the next Subsection, that takes \(\textbf{m}'_{enc}\) and \(\textbf{m}''_{enc}\) as inputs to compute two shares \(\textbf{m}'\), \(\textbf{m}''\) of the decoded message \(\textbf{m}\) in a fairly efficient way. 
+
 
 \subsection{Masked Decoder}
 
