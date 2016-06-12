@@ -6,44 +6,46 @@
 Blinding is a countermeasure commonly used to prevent side-channel attacks like \textit{Differential Power Analysis} (DPA) \cite{DBLP:conf/crypto/KocherJJ99}. It is used to add additional randomness to mathematical operations in a way, that the attacker can not easily draw conclusions from his observations. This Section summarizes two blinding countermeasures presented in \cite{cryptoeprint:2016:276}, which appear to be of special interest for Ring-LWE cryptosystems. While the first countermeasure will be an approach to blinding of polynomial multiplication within a ring \(R_q\), the second one will be a blinding countermeasure for Gaussian sampling. All those techniques are believed to help against the attacks we described in \ref{bliss}, yet this has not been verified.
 
 \section{Blinding Polynomial Multiplication}
-There are two pretty types of blinding for polynomial multiplications, the first of whom is the multiplication of each polinomial with a constant. For two polynomials \(f,g \in R_q\) and constants \(a,b \in \mathbb{Z}_q\) the blinding operation and the inverse operation look as follows:
-\begin{center}
-	\(h(x) = a f(x) \cdot b g(x)\)\\
-	\(f(x) \cdot g(x) = (ab)^{-1} h(x)\)
-\end{center}
-The second type would be circularly shifting the coefficients in each of the polynomials. As a polinomial can be written as \(f(x) = \sum_{i=0}^{n-1} f_i x^i\), a shift by \(j\) positions would be equal to the following computation:
-\begin{center}
-	\(x^j f(x) = \sum_{i=0}^{n-1} f_i x^{i+j} = \sum_{i=0}^{n-1} f_{i-j} x^i \)
-\end{center}
-Both of those blinding operation can be combined within one function, which will be called \(\textsc{PolyBlind}(\textbf{v},s,c)\) from now on. This function works on coefficient vectors of length \(n\) instead of the polynomials themselves and is given in Algorithm \ref{alg:PolyBlind}.\newline
+There are two pretty types of blinding for polynomial multiplications, the first of whom is the multiplication of each polinomial with a constant. For two polynomials \(\textbf{f},\textbf{g} \in R_q\) and constants \(a,b \in \mathbb{Z}_q\) the blinding operation and the inverse operation look as follows:
+\begin{equation}
+	\textbf{h} = a \textbf{f} \cdot b \textbf{g}
+\end{equation}
+\begin{equation}
+	\textbf{f} \cdot \textbf{g} = (ab)^{-1} \textbf{h}
+\end{equation}
+The second type would be circularly shifting the coefficients in each of the polynomials. As a polynomial can be written as \(\textbf{f} = \sum_{i=0}^{n-1} f_i x^i\) with \(f_i\) being the \(i\)-th coefficient of the polynomial \(\textbf{f}\), a shift by \(j\) positions would be equal to the following computation:
+\begin{equation}
+	x^j \textbf{f} = \sum_{i=0}^{n-1} f_i x^{i+j} = \sum_{i=0}^{n-1} f_{i-j} x^i
+\end{equation}
+Both of those blinding operation can be combined within one function, which will be called \(\textsc{PolyBlind}(\textbf{v},s,c)\) from now on. This function works on the coefficient vectors of polynomials of degree \(n\) and is given in Algorithm \ref{alg:PolyBlind}.\newline
 \begin{algorithm}
     \caption{\textsc{PolyBlind}}
     \label{alg:PolyBlind}
     \begin{algorithmic}[1]
-    	\Require{coefficient vector \textbf{v}, number of shifts \(s\), constant \(c\)}
-        \Ensure{blinded coefficient vector \textbf{v'}}
+    	\Require{coefficient vector \(\vec{v}\), number of shifts \(s\), constant \(c\)}
+        \Ensure{blinded coefficient vector \(\vec{v'}\)}
         \For{\(i=0,...,n-s-1\)}
         	\State{\(v_i'=cv_{i+s}\) mod \(q\)}
         \EndFor
         \For{\(i=n-s,...,n-1\)}
         	\State{\(v_i'=q - cv_{i+s-n}\) mod \(q\)}
         \EndFor\\
-        \Return{\(\textbf{v'}\)}
+        \Return{\(\vec{v'}\)}
     \end{algorithmic}
 \end{algorithm}
-The inverse operation can be denoted by \(\textsc{PolyBlind}(\textbf{v'},-s,c^{-1})\). Due to the isometries of the ring \(R_q\), the multiplication of two polynomials (here: their coefficient vectors) can be blinded using the \(\textsc{PolyBlind}\) function in the following way:
+The inverse operation can be denoted by \(\textsc{PolyBlind}(\vec{v'},-s,c^{-1})\). Due to the isometries of the ring \(R_q\), the multiplication of two polynomials (here: their coefficient vectors) can be blinded using the \(\textsc{PolyBlind}\) function in the following way:
 \begin{center}
-	\(\textbf{f'} = \textsc{PolyBlind}(\textbf{f},r,a)\) with \(r \in_R {0,...,n-1}\) and \(a \in_R \mathbb{Z}_q\)\\
-	\(\textbf{g'} = \textsc{PolyBlind}(\textbf{g},s,b)\) with \(s \in_R {0,...,n-1}\) and \(b \in_R \mathbb{Z}_q\)\\
-	\(\textbf{h'} = \textbf{f'} \cdot \textbf{g'}\)\\
-	\(\textbf{h} = \textsc{PolyBlind}(\textbf{h'},-(r+s),(ab)^{-1})\)
+	\(\vec{f'} = \textsc{PolyBlind}(\vec{f},r,a)\) with \(r \in_R {0,...,n-1}\) and \(a \in_R \mathbb{Z}_q\)\\
+	\(\vec{g'} = \textsc{PolyBlind}(\vec{g},s,b)\) with \(s \in_R {0,...,n-1}\) and \(b \in_R \mathbb{Z}_q\)\\
+	\(\vec{h'} = \vec{f'} \cdot \vec{g'}\)\\
+	\(\vec{h} = \textsc{PolyBlind}(\vec{h'},-(r+s),(ab)^{-1})\)
 \end{center}
 
 \section{Blinding Gaussian Sampling}
 As with the blinding of polynomial multiplication in the last subsection, there are two pretty easy ways to blind the coefficient vectors during the process of Gaussian sampling. We will again give a short description of both of them and present a function, that combines both methods.\\
 We define a function \(\textsc{VectorSample}(n,\sigma)\), that samples and returns a vector according to the discrete Gaussian distribution \(\mathcal{N}_\mathbb{Z}^{n} (0, \sigma^2)\). A naiv implementation of this function could lead to leakage of information to an attacker using e.g. DPA. This has been done in the cache attack from \cite{cryptoeprint:2016:300} we described in Section \ref{bliss}.\\
-The first approach to blinding would be to randomly shuffle the elements in the coeffcient vector. The function \(\textsc{VectorShuffle}(\textbf{x})\) is doing exactly that, so that \(\textsc{VectorShuffle}(\textsc{VectorSample}(n,\sigma))\) would increase security to a certain extend.\\
-For the second approach we need to take a short detour through probability theory. For two Gaussian distributions \(X=\mathcal{N}_\mathbb{Z}^{n} (\mu_X, \sigma^2_X)\) and \(Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_Y, \sigma^2_Y)\) it holds that their sum is equal to \(X+Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_X+\mu_Y, \sigma^2_X+\sigma^2_Y)\). As we focus on zero-centered distributions, the center does not change for us. For the standard deviation it follows, that \(\sigma_{X+Y}=\sqrt{\sigma^2_x+\sigma^2_Y}\). Algorithm \ref{alg:VectorBlindSample} is one possible way to make use of those characteristics of Gaussian distributions. It also makes use of the \(\textsc{VectorShuffle}(\textbf{x})\) function to increase overall security. Another, very similar approach, has been described in \cite{cryptoeprint:2014:254}.
+The first approach to blinding would be to randomly shuffle the elements in the coeffcient vector. The function \(\textsc{VectorShuffle}(\vec{x})\) is doing exactly that, so that \(\textsc{VectorShuffle}(\textsc{VectorSample}(n,\sigma))\) would increase security to a certain extend.\\
+For the second approach we need to take a short detour through probability theory. For two Gaussian distributions \(X=\mathcal{N}_\mathbb{Z}^{n} (\mu_X, \sigma^2_X)\) and \(Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_Y, \sigma^2_Y)\) it holds that their sum is equal to \(X+Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_X+\mu_Y, \sigma^2_X+\sigma^2_Y)\). As we focus on zero-centered distributions, the center does not change for us. For the standard deviation it follows, that \(\sigma_{X+Y}=\sqrt{\sigma^2_x+\sigma^2_Y}\). Algorithm \ref{alg:VectorBlindSample} is one possible way to make use of those characteristics of Gaussian distributions. It also makes use of the \(\textsc{VectorShuffle}(\vec{x})\) function to increase overall security. Another, very similar approach, has been described in \cite{cryptoeprint:2014:254}.
 
 %#############
 %evtl noch weiter ausführen, je nachdem wie viele Seiten wir am Ende noch vollkriegen müssen
@@ -54,12 +56,12 @@ For the second approach we need to take a short detour through probability theor
     \label{alg:VectorBlindSample}
     \begin{algorithmic}[1]
     	\Require{length of the vector \(n\), number of iterations \(m\), standard deviation \(\sigma\)}
-        \Ensure{sampled vector \textbf{x}}
+        \Ensure{sampled vector \(\vec{x}\)}
         \State{\(\textbf{x}=\textbf{0}\)}
         \For{\(i=1,...,m\)}
-        	\State{\(\textbf{x} = \textbf{x} + \mathcal{N}_\mathbb{Z}^{n} (0, (\frac{1}{\sqrt{m}}\sigma)^2)\)}
-        	\State{\(\textbf{x} = \textsc{VectorShuffle}(\textbf{x})\)}
+        	\State{\(\vec{x} = \vec{x} + \mathcal{N}_\mathbb{Z}^{n} (0, (\frac{1}{\sqrt{m}}\sigma)^2)\)}
+        	\State{\(\vec{x} = \textsc{VectorShuffle}(\vec{x})\)}
         \EndFor\\
-        \Return{\(\textbf{x}\)}
+        \Return{\(\vec{x}\)}
     \end{algorithmic}
 \end{algorithm}
