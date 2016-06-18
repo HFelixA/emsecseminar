@@ -8,7 +8,41 @@
 \section{Gaussian Sampling} %Eventuell zur Theorie
 
 \subsection{CDT Sampling}
+Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[o, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
 
+The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervalls $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdt} summarizes the guide table approach.
+ \begin{algorithm}
+ 	\caption{CDT Sampling With Guide Table}
+ 	\label{algcdt}
+ 	\begin{algorithmic}[1]
+ 		\Require{ Big table $T[y]$ containing values $p^*_y$ of the cumulative distribution function of the discrete Gaussian distribution (using only non-negative values), omitting the first byte. Samll table $I$  consisting of the 256 intervals.}
+ 		\Ensure{Value $y \in [-r\sigma, r\sigma]$, sampled with probability according to $D_\sigma$}
+ 		\State{pick a random byte $r$}
+ 		\State{Let $(I_{min}, I_{max}) = (a_r, b_r)$ be the left and right bounds of interval $I[r]$}
+ 		\If{$I_{max}-I_{min} = 1$}
+	 		\State{generate a random sign bit $b \in \{0,1\}$}
+	 		\State
+	 		\Return {$y=(-1)^bI_{min}$}
+	 	\EndIf
+	 	\State{Let $i=1$ denote the index of the byte to look at}
+	 	\State{Pick a new random byte r}
+	 	\While{$1$}
+			\State{$I_z = \lfloor \frac{I_{min}+I_{max}}{2}\rfloor$} 
+			\If{$r > (i$th byte of $T[I_z])$}
+				\State{$I_{min} = I_z$}
+			\ElsIf{$r < (i$th byte of $T[I_z])$}
+				\State{$I_{max} = I_z$}
+			\ElsIf{$I_{max}-I_{min} = 1$}
+				\State{generate a random sign bit $b \in \{0,1\}$}
+				\State
+				\Return{$y=(-1)^bI_{min}$}
+				\Else
+				\State{increase $i$ by $1$}
+				\State{pick new random byte r}
+			\EndIf	
+		\EndWhile
+ 	\end{algorithmic}
+ \end{algorithm}
 \subsection{Rejection Sampling}
 
 \section{Attacking the Sampling Algorithms}
