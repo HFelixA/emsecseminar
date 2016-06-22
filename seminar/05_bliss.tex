@@ -53,7 +53,15 @@ This algorithm reduces the amount of rejected samples significantly. It begins w
 This last step still requeres some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
 
 
+\section{The FLUSH+RELOAD Attack}
+The attack used in PAPER HIER EINFÜGEN is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
+
+If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.
+
+The higher access times on the lower cache levels are exploited by cache timing attacks like the FLUSH+RELOAD attack. The attacker has to use the same memory as the victim to apply this kind of attack. He can monitor the state of the cache and use the timing differences to check which memory blocks are cached and which addresses were accessed by the victim. If done correctly, the attacker can deduce the cache lines of the victims table access, which limits the possible chosen values.
+
+
+The FLUSH+RELOAD attack abuses the x86\_64 instruction \verb|clflush| to evict a memory block from cache, before the victim executes his algorithm. After the victim is done with his memory access, he measures the time to access the memory block again. If the victim accessed the memory block, the block will be in a fast cache level and the access time will be low. If it was not accessed, the CPU has to load the memory block from a lower cache level and the access will be much slower. The attacker then knows, if the flushed memory block was accessed or not.
 
 \section{Attacking the Sampling Algorithms}
-
 \section{Evaluation}
