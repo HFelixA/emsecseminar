@@ -44,6 +44,15 @@ The binary search in this sampling method can take some time, so one can speed i
  	\end{algorithmic}
  \end{algorithm}
 \subsection{Rejection Sampling}
+Rejection Sampling basically accepts a sampled uniformly random integer $y \in [-r\sigma, r\sigma]$ with probability $p_\sigma(y)/p_\sigma(\mathbb{Z})$. This is done by sampling a uniformly random value $r \in [0,1)$ and accepting the unformly random $y$ if $r \le p_\sigma(y)$. This procedure can be quite expensive, because $p_\sigma(y)$ has to be calculated to a high precision and even then the rejection rate may be quite high.
+
+The authers of the paper which introduces BLISS (QUELLE) proposed a more efficient rejection sampling algorithm, which will be used in the following chapters.%kann man das so schreiben
+
+This algorithm reduces the amount of rejected samples significantly. It begins with sampling a value $x$ according to the binary discrete Gaussian distribution $D_{\sigma 	_{2}}$ with $\sigma _2 = \frac{1}{2 ln 2}$. Uniformly random bits can be used to do this efficiently. $y = Kx + z, z \in \{0,...,K-1\}$ is then uniformly random sampled and $K = \lfloor\frac{\sigma}{\sigma _2} + 1\rfloor$ is distributed according to the targeted discrete Gaussian distribution $D_\sigma$ by rejecting when $b = \exp (−z(z + 2Kx)/(2σ^2)) = 0$ holds.
+
+This last step still requeres some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
+
+
 
 \section{Attacking the Sampling Algorithms}
 
