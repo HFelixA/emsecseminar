@@ -17,7 +17,9 @@ A lattice \(\Lambda\) is discrete subgroup of \(\mathbb{R}^n\) that is defined a
 The set \(\{\vec{b}_1,...,\vec{b}_m\}\) of those vectors is called the basis of that lattice, which commonly is represented by a matrix \(\textbf{B}=(\vec{b}_1,...,\vec{b}_m)\).\\
 Furthermore, an ideal lattice is is lattice that corresponds to ideals in a ring \(R_q\). From this it follows that we can deal with polynomials instead of matrices, which makes arithmetics used for cryptographic applications much more efficient. In our paper we will confine ourselves to those ideal lattices, as most of the current work in that area focuses around them. For more on the topic of ideal lattices, see \cite{cryptoeprint:2012:230}.
 
-\section{Learning with Errors Problem}
+\section{Ring Learning with Errors Problem}
+The \acf{ring-LWE} has been introduced in \cite{cryptoeprint:2012:230} in 2012. There are two instances of the \ac{ring-LWE}, a search one and a decisional one. For both of them, we can state that there is a given \(\textbf{s} \in R_q\). Next, an error polynomial \(\textbf{e}_i \in R_q\) is sampled from the discrete Gaussian distribution \(\mathcal{N}_\mathbb{Z}^{n} (0, \sigma^2)\) and another polynomial \(\textbf{a}_i \in R_q\) is sampled uniformy at random. Finally, a polynomial \(\textbf{b}_i\) is computed as \(\textbf{b}_i = (\textbf{a}_i \cdot \textbf{s}) + \textbf{e}_i\).\\
+For the \textit{search} \ac{ring-LWE} problem, one needs to find the unknown polynomial \(\textbf{s}\) for a given pair \((\textbf{a}_i, \textbf{b}_i)\). The \textit{decisional} \ac{ring-LWE} problem is about distinguishing between pairs \((\textbf{a}_i, \textbf{b}_i)\) that have actually been computed the way described before and pairs \((\textbf{a}_i, \textbf{b}_i)\) that have been sampled uniformly at random in \(R_q\).
 
 \section{Discrete Gaussian Distribution}
 The discrete Gaussian distribution with mean \(\mu\) and standard deviation \(\sigma\) is denoted as \(\mathcal{N}_\mathbb{Z} (\mu, \sigma^2)\). In this paper we will focus on zero-centered distributions \(\mathcal{N}_\mathbb{Z} (0, \sigma^2)\) with a density function \(\rho_\sigma(x)\) given by:
