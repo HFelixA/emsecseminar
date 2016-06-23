@@ -22,3 +22,10 @@ The masked message returned by this approach is \((\textbf{m}', \textbf{m} \oplu
 The advantage of this approach is, that no masked decoder is needed. For decoding, an unprotected decoder might be used without leaking any useful information for an attacker.
 
 \section{Evaluation}
+As we can precompute \(\textbf{m}'\) and \((\textbf{c}'_1, \textbf{c}'_2)\) due to the independency of \(\textbf{m}'\), the tradeoff in terms of efficiency seems to be pretty reasonably. Note that it was not possible to do any precomputations when using the masked decoder described in the previous Section.\\
+Furthermore, the complexity of the implementation of this approach is much lower compared to the other approach, which needs a carefully implemented masked decoder.\\
+However, the error rate of the new scheme is about a hundred times higher than the \ac{ring-LWE} encryption scheme with masking being turned off. This effect might be compensated by increasing the modulus \(q\) by one bit from 13 to 14 bits or by decreasing the standard deviation \(\sigma\) of the discrete Gaussian distribution.\\
+Although, straightforward first-order \ac{DPA} attacks do not immediately work on our masking approach, more refined ones are still possible. This is due to the fact, that the key itself is not masked. The masking is only making it harder for an attacker to model the power consumption for first-order \ac{DPA}.\\
+Using the same technique as before, the authors of \cite{Reparaz2016} showed that while first-order \ac{DPA} attacks on the decryption with the masks being turned off are easy to conduct, the same attack on the scheme with masking being turned on is not possible straight away. More details on this can be found in the corresponding paper.
+
+
