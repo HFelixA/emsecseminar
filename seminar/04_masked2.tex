@@ -2,8 +2,23 @@
 % Sample conclusion of your thesis
 %
 
-\chapter{Masking the Ring-LWE Encryption Scheme II}
+\chapter{Additively Homomorphic ring-LWE Masking}
+Less than a year after \cite{maskedRing} (which has been described in the last Section) was published, Reparaz et. al. published a follow-up paper \cite{Reparaz2016} introducing a much easier approach for the masking of the \ac{ring-LWE} encryption scheme.\\
+In the following, the approach of said paper will be introduced and evaluated in terms of efficiency and side-channel attack resistance. In our description we again focus on the \ac{LPR} scheme, though the techniques are also applicable for other \ac{ring-LWE} encryption schemes.
 
 \section{Implementation}
+For \ac{ring-LWE} masking, we make use of the fact that the \ac{LPR} encryption scheme is additively homomorphic. Thus for given ciphertexts \((\textbf{c}_1, \textbf{c}_2)\) and \((\textbf{c}'_1, \textbf{c}'_2)\), which are the encryption of two messages \(\textbf{m}\) and \(\textbf{m}'\) with \(m_i, m'_i \in \{0,1\}\) using the same public key \(\textbf{p}\), it follows that \((\textbf{c}_1+\textbf{c}'_1, \textbf{c}_2+\textbf{c}'_2)\) is the encryption of \(\textbf{m} \oplus \textbf{m}'\). As a consequence we can write down the following equation:
+\begin{equation}
+	decryption(\textbf{c}_1,\textbf{c}_2) \oplus decryption(\textbf{c}'_1,\textbf{c}'_2) = decryption(\textbf{c}_1 + \textbf{c}'_1,\textbf{c}_2 + \textbf{c}'_2)
+\end{equation}
+Now, we want to make use of the prperty of additive homomorphism for our masking scheme. This, again, focuses on the decryption function, as this is the part of the encryption scheme, where the secret key is used, which makes it a prime target for attackers.\\
+To randomize the decryption of \((\textbf{c}_1, \textbf{c}_2)\), we need to follow three simple steps:
+\begin{enumerate}
+\item Generate a random message \(\textbf{m}'\) unknown to the adversary
+\item Encrypt \(\textbf{m}'\) to \((\textbf{c}'_1, \textbf{c}'_2)\)
+\item Decrypt \((\textbf{c}_1+\textbf{c}'_1, \textbf{c}_2+\textbf{c}'_2)\) to receive \(\textbf{m} \oplus \textbf{m}'\)
+\end{enumerate}
+The masked message returned by this approach is \((\textbf{m}', \textbf{m} \oplus \textbf{m}')\), such that \(\textbf{m} = (\textbf{m} \oplus \textbf{m}') \oplus \textbf{m}'\).\\
+The advantage of this approach is, that no masked decoder is needed. For decoding, an unprotected decoder might be used without leaking any useful information for an attacker.
 
 \section{Evaluation}
