@@ -7,11 +7,11 @@ Less than a year after \cite{maskedRing} (which has been described in the last S
 In the following, the approach of said paper will be introduced and evaluated in terms of efficiency and side-channel attack resistance. In our description we again focus on the \ac{LPR} scheme, though the techniques are also applicable for other \ac{ring-LWE} encryption schemes.
 
 \section{Implementation}
-For \ac{ring-LWE} masking, we make use of the fact that the \ac{LPR} encryption scheme is additively homomorphic. Thus for given ciphertexts \((\textbf{c}_1, \textbf{c}_2)\) and \((\textbf{c}'_1, \textbf{c}'_2)\), which are the encryption of two messages \(\textbf{m}\) and \(\textbf{m}'\) with \(m_i, m'_i \in \{0,1\}\) using the same public key \(\textbf{p}\), it follows that \((\textbf{c}_1+\textbf{c}'_1, \textbf{c}_2+\textbf{c}'_2)\) is the encryption of \(\textbf{m} \oplus \textbf{m}'\). As a consequence we can write down the following equation:
+For \ac{ring-LWE} masking, we make use of the fact that the \ac{LPR} encryption scheme is additively homomorphic. Thus for given ciphertexts \((\textbf{c}_1, \textbf{c}_2)\) and \((\textbf{c}'_1, \textbf{c}'_2)\), which are the encryption of two messages \(\textbf{m}\) and \(\textbf{m}'\) with \(m_i, m'_i \in \{0,1\}\) using the same public key \(\textbf{p}\), it follows that \((\textbf{c}_1+\textbf{c}'_1, \textbf{c}_2+\textbf{c}'_2)\) is the encryption of \(\textbf{m} \oplus \textbf{m}'\). As a consequence, we can write down the following equation:
 \begin{equation}
 	decryption(\textbf{c}_1,\textbf{c}_2) \oplus decryption(\textbf{c}'_1,\textbf{c}'_2) = decryption(\textbf{c}_1 + \textbf{c}'_1,\textbf{c}_2 + \textbf{c}'_2)
 \end{equation}
-Now, we want to make use of the prperty of additive homomorphism for our masking scheme. This, again, focuses on the decryption function, as this is the part of the encryption scheme, where the secret key is used, which makes it a prime target for attackers.\\
+Now, we want to make use of the property of additive homomorphism for our masking scheme. This, again, focuses on the decryption function, as this is the part of the encryption scheme, where the secret key is used, which makes it a prime target for attackers.\\
 To randomize the decryption of \((\textbf{c}_1, \textbf{c}_2)\), we need to follow three simple steps:
 \begin{enumerate}
 \item Generate a random message \(\textbf{m}'\) unknown to the adversary
