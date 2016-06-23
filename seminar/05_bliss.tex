@@ -5,17 +5,17 @@
 \chapter{Flush+Reload Cache Attack on Bliss}
 \label{bliss}
 
-\section{Gaussian Sampling} %Eventuell zur Theorie
+\section{Gaussian Sampling} 
+%HIER AM BESTEN NOCH EINE ALLGEMEINE EINFÜHRUNG
 
 \subsection{CDT Sampling}
-Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[o, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
-
-The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervalls $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdt} summarizes the guide table approach.
+Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[o, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located.\\
+The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervals $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdt} summarizes the guide table approach.
  \begin{algorithm}
  	\caption{CDT Sampling With Guide Table}
  	\label{algcdt}
  	\begin{algorithmic}[1]
- 		\Require{ Big table $T[y]$ containing values $p^*_y$ of the cumulative distribution function of the discrete Gaussian distribution (using only non-negative values), omitting the first byte. Samll table $I$  consisting of the 256 intervals.}
+ 		\Require{ Big table $T[y]$ containing values $p^*_y$ of the cumulative distribution function of the discrete Gaussian distribution (using only non-negative values), omitting the first byte. Small table $I$ consisting of the 256 intervals.}
  		\Ensure{Value $y \in [-r\sigma, r\sigma]$, sampled with probability according to $D_\sigma$}
  		\State{pick a random byte $r$}
  		\State{Let $(I_{min}, I_{max}) = (a_r, b_r)$ be the left and right bounds of interval $I[r]$}
@@ -44,23 +44,16 @@ The binary search in this sampling method can take some time, so one can speed i
  	\end{algorithmic}
  \end{algorithm}
 \subsection{Rejection Sampling}
-Rejection Sampling basically accepts a sampled uniformly random integer $y \in [-r\sigma, r\sigma]$ with probability $p_\sigma(y)/p_\sigma(\mathbb{Z})$. This is done by sampling a uniformly random value $r \in [0,1)$ and accepting the unformly random $y$ if $r \le p_\sigma(y)$. This procedure can be quite expensive, because $p_\sigma(y)$ has to be calculated to a high precision and even then the rejection rate may be quite high.
-
-The authers of the paper which introduces BLISS (QUELLE) proposed a more efficient rejection sampling algorithm, which will be used in the following chapters.%kann man das so schreiben
-
-This algorithm reduces the amount of rejected samples significantly. It begins with sampling a value $x$ according to the binary discrete Gaussian distribution $D_{\sigma 	_{2}}$ with $\sigma _2 = \frac{1}{2 ln 2}$. Uniformly random bits can be used to do this efficiently. $y = Kx + z, z \in \{0,...,K-1\}$ is then uniformly random sampled and $K = \lfloor\frac{\sigma}{\sigma _2} + 1\rfloor$ is distributed according to the targeted discrete Gaussian distribution $D_\sigma$ by rejecting when $b = \exp (−z(z + 2Kx)/(2σ^2)) = 0$ holds.
-
-This last step still requeres some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
-
+Rejection Sampling basically accepts a sampled uniformly random integer $y \in [-r\sigma, r\sigma]$ with probability $p_\sigma(y)/p_\sigma(\mathbb{Z})$. This is done by sampling a uniformly random value $r \in [0,1)$ and accepting the uniformly random $y$ if $r \le p_\sigma(y)$. This procedure can be quite expensive, because $p_\sigma(y)$ has to be calculated to a high precision and even then the rejection rate may be quite high.\\
+The authors of the paper introducing BLISS (QUELLE) proposed a more efficient rejection sampling algorithm, which will be used in the following chapters.\\
+This algorithm reduces the amount of rejected samples significantly. It begins with sampling a value $x$ according to the binary discrete Gaussian distribution $D_{\sigma 	_{2}}$ with $\sigma _2 = \frac{1}{2 ln 2}$. Uniformly random bits can be used to do this efficiently. $y = Kx + z, z \in \{0,...,K-1\}$ is then uniformly random sampled and $K = \lfloor\frac{\sigma}{\sigma _2} + 1\rfloor$ is distributed according to the targeted discrete Gaussian distribution $D_\sigma$ by rejecting when $b = \exp (−z(z + 2Kx)/(2σ^2)) = 0$ holds.\\
+This last step still requires some computing because of the exponential value $b$, but the authors provided a more efficient algorithm for this, too. 
+%algorithmen einfügen
 
 \section{The FLUSH+RELOAD Attack}
-The attack used in PAPER HIER EINFÜGEN is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
-
-If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.
-
-The higher access times on the lower cache levels are exploited by cache timing attacks like the FLUSH+RELOAD attack. The attacker has to use the same memory as the victim to apply this kind of attack. He can monitor the state of the cache and use the timing differences to check which memory blocks are cached and which addresses were accessed by the victim. If done correctly, the attacker can deduce the cache lines of the victims table access, which limits the possible chosen values.
-
-
+The attack used in PAPER HIER EINFÜGEN is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the CPU core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.\\
+If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.\\
+The higher access times on the lower cache levels are exploited by cache timing attacks like the FLUSH+RELOAD attack. The attacker has to use the same memory as the victim to apply this kind of attack. He can monitor the state of the cache and use the timing differences to check which memory blocks are cached and which addresses were accessed by the victim. If done correctly, the attacker can deduce the cache lines of the victims table access, which limits the possible chosen values.\\
 The FLUSH+RELOAD attack abuses the x86\_64 instruction \verb|clflush| to evict a memory block from cache, before the victim executes his algorithm. After the victim is done with his memory access, he measures the time to access the memory block again. If the victim accessed the memory block, the block will be in a fast cache level and the access time will be low. If it was not accessed, the CPU has to load the memory block from a lower cache level and the access will be much slower. The attacker then knows, if the flushed memory block was accessed or not.
 
 \section{Attacking the Sampling Algorithms}
