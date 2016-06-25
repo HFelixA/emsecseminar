@@ -8,12 +8,12 @@
 \section{Gaussian Sampling} %Eventuell zur Theorie
 
 \subsection{CDT Sampling}
-Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[o, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
+Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[0, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
 
-The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervalls $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdt} summarizes the guide table approach.
+The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervals $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdtwtable} summarizes the guide table approach.
  \begin{algorithm}
  	\caption{CDT Sampling With Guide Table}
- 	\label{algcdt}
+ 	\label{algcdtwtable}
  	\begin{algorithmic}[1]
  		\Require{ Big table $T[y]$ containing values $p^*_y$ of the cumulative distribution function of the discrete Gaussian distribution (using only non-negative values), omitting the first byte. Samll table $I$  consisting of the 256 intervals.}
  		\Ensure{Value $y \in [-r\sigma, r\sigma]$, sampled with probability according to $D_\sigma$}
@@ -50,7 +50,7 @@ The authers of \cite{bliss} which introduced BLISS proposed a more efficient rej
 
 This algorithm reduces the amount of rejected samples significantly. It begins with sampling a value $x$ according to the binary discrete Gaussian distribution $D_{\sigma 	_{2}}$ with $\sigma _2 = \frac{1}{2 ln 2}$. Uniformly random bits can be used to do this efficiently. $y = Kx + z, z \in \{0,...,K-1\}$ is then uniformly random sampled and $K = \lfloor\frac{\sigma}{\sigma _2} + 1\rfloor$ is distributed according to the targeted discrete Gaussian distribution $D_\sigma$ by rejecting when $b = \exp (−z(z + 2Kx)/(2σ^2)) = 0$ holds.
 
-This last step still requeres some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
+This last step still requires some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
  \begin{algorithm}
  	\caption{Sampling from $D^+_{K_{\sigma}}$ for $K\in\mathbb{Z}$}
  	\label{algrjt1}
@@ -97,7 +97,7 @@ This last step still requeres some computing because of the exponential value $b
   	\end{algorithmic}
   \end{algorithm}
 
-\section{The FLUSH+RELOAD Attack}
+\section{The FLUSH+RELOAD Cache Attack}
 The attack used in \cite{cryptoeprint:2016:300} is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
 
 If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.
@@ -108,13 +108,42 @@ The higher access times on lower cache levels are exploited by cache timing atta
 The FLUSH+RELOAD attack abuses the x86\_64 instruction \verb|clflush| to evict a memory block from cache, before the victim executes his algorithm. After the victim is done with his memory access, he measures the time to access the memory block again. If the victim accessed the memory block, the block will be in a fast cache level and the access time will be low. If it was not accessed, the CPU has to load the memory block from a lower cache level and the access will be much slower. The attacker then knows, if the flushed memory block was accessed or not.
 
 \subsection{Attacking CDT Sampling}
-The CDT sampling algorithm with an interval table $I$ and a table with actual values $T$ 
+The CDT sampling algorithm with an interval table $I$ and a table with actual values $T$ like in algorithm \ref{algcdtwtable} can leak information based on cache hits and cache misses.
 
+A cache attack as described above can only yield the cache lines of index $u$ of the interval table and the cache line of index $I_z$ of the look-up in $T$. This leaves a range of values for $|y_i|$, additionally the sign of $y_i$is not stored in the table. But the combination of both table look-ups can yield precise information, too.
+Two possible combinations of table accesses are \textit{intersection} and \textit{last-jump}. \\
+The intersection cache weakness intersects knowledge about index $u$ in $I$ and the access $T[I_z]$. Sometimes values in the range of intervalls are largly not overlapping with the range of values from $T[I_z]$, so the intersection %schnittmenge?!
+narrows down the possible values. If, for example, the sample $|y_i|$ has to be in the set $S_1 = \{0,1,2,3,4,5,6,7,8\}$ according to the cache line $I[u]$, but $T[I_z]$ reveals $|y_i|$ must be in $S_2 = \{8,9,10,11,12,13,14,15\}$, we can learn $|y_i| \in S_1 \cap S_2 = \{7,8\}$.\\
+Another abusable weakness is called \textit{last-jump} and can be used if elements of an interval $I[u]$ are spread over two cache lines of $T$. For example interval $I[u] = {5,6,7,8,9}$ is divided over cache-lines $T_1 = \{0,1,2,3,4,5,6,7\}$ and $T_2 = \{8,9,10,11,12,13,14,15\}$. A binary search will start at the value $7$ in the always accessed cache-line $T_1$, but cache-line $T_2$ is only accessed, if $|y_i| \in \{8,9\}$.\\
+\cite{cryptoeprint:2016:300} restricted the patterns even more: 
+\begin{itemize}
+	\item To limit the maximum possible error of $|y_i|$ to at most 1, only the weaknesses are used, in which the number of candidates for $|y_i|$ is 2.
+	\item Because adjacent intervals can partially overlap, $I[u] \cap I[v] \neq 0$ for $u = v+1$, for certain parts of $I[u]$, the outcome of the sample is biased.
+	The second restriction considers only cache weaknesses for which one of the two candidates is much more likely to be sampled.
+	\begin{equation*}
+		\mathbb{P}[|y_i| = \gamma_1 | y_i \in \{\gamma_1,\gamma_2\}\subset I[u]] \gg \mathbb{P}[|y_i| = \gamma_2 | y_i \in \{\gamma_1,\gamma_2\}\subset I[u]]	
+	\end{equation*}
+	Values $\gamma_1$ with $\mathbb{P}[X=\gamma_1 | X \in \{\gamma_1, \gamma_2\}\subset I[u]] = 1-\alpha$ with small $\alpha$ are wanted.
+	Together with the first restriction, a matched access pattern is almost always $\gamma_1$.
+	\item To learn the sign of $|y_i|$, only cache patterns with $|y_i| > \beta \cdot \mathbb{E}[\langle s,c \rangle ], \beta \ge 1$ are used. By looking at the sign of $z_i$ the sign of $y_i$ can be learned, because 
+	\begin{equation*}
+	sign(y_i) \neq sign(z_i) \iff \langle s,c \rangle > (y_i+z_i)	
+	\end{equation*}
+\end{itemize}
+Choosing different values $\alpha$ and $\beta$ is flexible, but might lead to no matching access patterns or let other parts fail. The paper described $\alpha \le 0.1$ had at least one usable cache access pattern for every parameter set. $\beta$ was not used in the experiments.
 
-HIER TEXT EINFÜGEN
+The attack assumes a cache access pattern reveals if $y_i \in \{\gamma_1, \gamma_2\}$ for $i = 0,...,n-1$ of polynomial $y$ and $\mathbb{P}[y_i = \gamma_1] = 1- \alpha$ with small $\alpha$. \\
+The victim then has to generate $N$ signatures $(z_j, c_j), j= 1,...,N$, which are collected by the attacker and the corresponding cache information for the noise polynomial $y_i$. When a cache weakness is found, the attacker has to solve the equation 
+\begin{equation*}
+	z_{ji} = y_{ji} + (-1)^{b_j}\langle s,c_ji \rangle
+\end{equation*}
+Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \gamma_1}$, the attacker adds $\xi_k = c_{ji}$ to a list of good vectors. With enough vectors $\xi_k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1 \le k \le n$ the matrix $L \in \{-1,0,1\}^{n \times n}$ can be formed. The column vectors $\xi_k$ satisfy $sL = v$, where $v$ is a unknown, but short, vector with norm about $\sqrt{\alpha n}$ in the lattice spanned by the rows of $l$. A lattice reduction algorithm, like LLL, can search for $v$ and output a uni-modular matrix $U$ with $UL = L'$. Every row of $U$ (or its rotations) is tested if it is a candidate for $s=f$ by checking against the public key.
 
+Because this last step is not always successful, not only $n$ but $m>n$ vectors $\xi_k$ are collected and a random subset forms the input for LLL.
+
+ALGORITHMUS HIER
 \subsection{Attacking Rejection Sampling} \label{rejection}
-When rejection sampling is used in the BLISS scheme, the side channel has to decide, if there was a table acces in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
+When rejection sampling is used in the BLISS signature scheme, the side channel has to decide, if there was a table acces in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
 
 Depending on the bit $i$ of input $x$, $ET[i]$ is accessed, if $x = 0$, no table look-up is performed. If the attacker detects this, he knows $z=0$ is the sampled value in step 2 in algorithm \ref{algrjt1}. In this case the attacker can assume $y \in \{0, \pm K, \pm 2K,...\}$ for usable cache access patterns.
 
@@ -123,7 +152,7 @@ So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in 
 EINRÜCKUNGEN NEU
 \begin{algorithm}
 	\caption{Cache attack on BLISS with Rejection sampling}
-	\label{algcdt}
+	\label{algcdtattack}
 	\begin{algorithmic}[1]
 		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. BLISS input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signatures $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses rejection sampling with small exponential table to sample noise polynomial y}
 		\Ensure{Secret key $S$}
@@ -157,7 +186,7 @@ EINSCHRÄNKUNGEN DER PARAMETER
 
 
 
-For each BLISS parameter set at least one cache weakness was found, which could be abused. 
+For each BLISS parameter set at least one usable cache weakness was found, which could be abused. 
 The attacker then collects $m$ coefficient vectors $c_j$ and runs LLL up to $t = 2(m-n)+1$ times searching for s. A bigger value $t$ is not likely to have better success probabilities, because the randomly constructed lattices have overlapping base vectors, so the authors of the paper considered a experiment failed after this number of tries. Each experiment (with different parameters and different sizes of $m$) was performed 1000 times to measure the success probability $p_{successs}$, the average number of required signatures $\bar{N}$ to get $m$ usable challenges and the average length of $v$, if one was found.
 The expected number of needed signatures is:
 \begin{equation*}
