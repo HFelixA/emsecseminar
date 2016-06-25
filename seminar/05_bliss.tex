@@ -54,7 +54,7 @@ This last step still requeres some computing because of the exponential value $b
 
 
 \section{The FLUSH+RELOAD Attack}
-The attack used in PAPER HIER EINFÜGEN is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
+The attack used in \cite{cryptoeprint:2016:300} is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
 
 If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.
 
@@ -66,26 +66,40 @@ The FLUSH+RELOAD attack abuses the x86\_64 instruction \verb|clflush| to evict a
 \subsection{Attacking CDT Sampling}
 The CDT sampling algorithm with an interval table $I$ and a table with actual values $T$ is attackable by the attack described above.
 
-\subsection{Attacking Rejection Sampling}
+\subsection{Attacking Rejection Sampling} \label{rejection}
 When rejection sampling is used in the BLISS scheme, the side channel has to decide, if there was a table acces in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
 
 Depending on the bit $i$ of input $x$, $ET[i]$ is accessed, if $x = 0$, no table look-up is performed. If the attacker detects this, he knows $z=0$ is the sampled value in step ALGORITHMUSSTEP in AlgBLA. In this case the attacker can assume $y \in \{0, \pm K, \pm 2K,...\}$ for usable cache access patterns.
 
-So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in \{0,...,n-1\}$ of the noise polynomial y. Because anyone can check if $max|\langle s,c \rangle |\le \kappa < K$ with the public parameters, $y_i$ can be determined completely with the signature vector $z$. With $N$ more signatures $(z_j, c_j), j =1,...N$, the attacker can search for  $y_{ji} \in \{0, \pm K, \pm 2K,...\}$ ($y_{ji}$ means the ith coefficient of$y_j$). If the attacker additionally sees, that $z_{ji} = y_{ji}$, he knows $\langle s, c_{ji} \rangle = 0$. Such vector is a \textit{good vector} for use in the attack and $\zeta _k = c_{ji}$ is saved for later (some known $y_{h}$ will be discarded, if they dont satisfy the necessary requirements). With $n$ of these vectors $\xi _k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1\le k \le n$ a matrix $L \ in \{-1,0,1\}^{nxn}$. The column vectors $\xi_k$ satisfy $sL = 0$ (0 is the all-zero vector) and most likely the only dependency of$\xi_k$ is introduced by s, so s is the only kernel vector. There is no need to randomize this process, because the all-zero vector is used.
+So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in \{0,...,n-1\}$ of the noise polynomial y. Because anyone can check if $max|\langle s,c \rangle |\le \kappa < K$ with the public parameters, $y_i$ can be determined completely with the signature vector $z$. With $N$ more signatures $(z_j, c_j), j =1,...,N$, the attacker can search for  $y_{ji} \in \{0, \pm K, \pm 2K,...\}$ ($y_{ji}$ means the ith coefficient of $y_j$). If the attacker additionally sees, that $z_{ji} = y_{ji}$, he knows $\langle s, c_{ji} \rangle = 0$. Such vector is a \textit{good vector} for use in the attack and $\zeta _k = c_{ji}$ is saved for later (some known $y_{ji}$ will be discarded, if they dont satisfy the necessary requirements). With $n$ of these vectors $\xi _k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1\le k \le n$ a matrix $L \in \{-1,0,1\}^{nxn}$ can be formed. The column vectors $\xi_k$ satisfy $sL = 0$ (0 is the all-zero vector) and most likely the only dependency of$\xi_k$ is introduced by s, so s is the only kernel vector. There is no need to randomize this process, because the all-zero vector is used.
 
 ALGORITHMUS   
 
-\section{Attacking the Sampling Algorithms with a Perfect Side Channel}
-The paper QUELLE provided experimental results for a perfect side-channel attack using the above attack. This requires the attacker to get every cache line of every table look-up while computing $y$ in CDT and rejection sampling algorithms. The victim is assumed to sign random messages and the signatures are collected by the attacker. Cache lines are 64 byte and each element is 8 byte. 
-To fulfill this requirements, the authors of QUELLE modified the \textit{reasearch oriented} C++ implementation published by the BLISS authorsQUELLE. NTL was used for LLL reductions and kernel calculations.
+\section{Attacking Sampling Algorithms with a Perfect Side Channel}
+The paper QUELLE provided experimental results for a perfect side-channel attack using the procedure explained. This requires the attacker to get every cache line of every table look-up while computing $y$ in CDT and rejection sampling algorithms. The victim is assumed to sign random messages and the signatures are collected by the attacker. Cache lines are 64 byte and each element is 8 byte. 
+To fulfill this requirements, the authors of \cite{cryptoeprint:2016:300} modified the \textit{reasearch oriented} C++ implementation published by the BLISS authors \cite{blisshp}. NTL was used for LLL reductions and kernel calculations.
 \subsection{Perfect Side Channel Attack on CDT Sampling}
+
 \subsection{Perfect Side Channel Attack on Rejection Sampling}
-The perfect side channel tells the attacker, if there was an table loo-up in the table $ET$. The attack explained  in section REFHIER can be applied and requires $m = n$ challenges $c_i$ for the kernel calculation, because no randomization is needed. By checking the cache lines of the small part of the table, the attacker can learn if any element has been accessed in $ET$. Only 100 experiments were performed in this case by the authors of PAPERHIER, because for all parameter sets $p_success = 1.0$ holds.
+The perfect side channel tells the attacker, if there was an table look-up in the table $ET$. The attack explained  in section \ref{rejection} can be applied and requires $m = n$ challenges $c_i$ for the kernel calculation, because no randomization is needed. By checking the cache lines of the small part of the table, the attacker can learn if any element has been accessed in $ET$. Only 100 experiments were performed  in \cite{cryptoeprint:2016:300}, because for all parameter sets $p_{success} = 1.0$ holds.
 
 The expected numbers of signatures needed is:
 \begin{equation*}
 	\mathbb{E}[N] = ((\frac{1}{p_\sigma(\mathbb{Z})}\sum_{x=-r\sigma}^{r\sigma}p_\sigma(xK))*\mathbb{P}[\langle s_1,c \rangle = 0])^{-1}	
 \end{equation*}
-with $K= \lfloor \frac{\sigma}{\sigma_2}+1\rfloor$ and tail-cut $r\ge 1$. This number is heavily dependent on the value $\sigma$, because $xK$ is more likely sampled for small $\sigma$
-
+with $K= \lfloor \frac{\sigma}{\sigma_2}+1\rfloor$ and tail-cut $r\ge 1$. The average number $\bar{N}$ of required signatures is heavily dependent on the value $\sigma$, because $xK$ is more likely to be sampled for small $\sigma$. 
+\begin{table}[h!]
+	\centering
+	\label{tab:rejectionperfect}
+	
+\begin{tabular}{|l|l|l|l|l|l|} 	
+	Parameter Set & m & $p_{success}$&$\bar{N}$&$\mathbb{E}[N]$&Offline Time\\\hline
+	BLISS-0 & 256 & 1.0 &1105 & 1102 &0.8s\\
+	BLISS-I&512&1.0&1671 & 1694 & 14.7s \\
+	BLISS-II&512 & 1.0 & 824&839 & 14.4s\\
+	BLISS-III&512 & 1.0 & 3018 & 2970 & 16.0s\\
+	BLISS-IV&512 & 1.0 & 4223 & 4154 & 18.1S\\
+\end{tabular}
+\caption{Experimental results of an attack on BLISS with rejection sampling using a perfect side channel}
+\end{table}
 \section{Evaluation}
