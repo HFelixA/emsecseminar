@@ -141,7 +141,33 @@ Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \ga
 
 Because this last step is not always successful, not only $n$ but $m>n$ vectors $\xi_k$ are collected and a random subset forms the input for LLL.
 
-ALGORITHMUS HIER
+ALGORITHMUS EINRÜCKUNGEN
+\begin{algorithm}
+	\caption{Cache attack on BLISS with CDT Sampling}
+	\label{algcdtattack}
+	\begin{algorithmic}[1]
+		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. BLISS input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signature polynomials $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses CDT sampling with tables $T, I$ for noise polynomial $y$. Cache weakness that allows to determine if coefficient $y_i \in \{\gamma_1,\gamma_2\}$ of $y$, and when this is the case, the value of $y_i$, is biased towards $\gamma_1$}
+		\Ensure{Secret key $S$}
+		\State{Let $k = 0$ be the number of vectors gained so far and let $M=[]$ be an empty list of vectors}
+		\While{$k<m$ (m vectors before randomising LLL)}
+		\State{Collect signature $(z_1, z_2^\dagger, c)$ together with cache information for each coefficient $y_i$ of noise polynomial $y$}
+		\For{$i=1,...,n$}
+		\If{$y_i \in \{\gamma_1, \gamma_2\}$ (according to cache information), and $z_{1i} = \gamma_1$}
+		\State{add vector $\xi_k = c_i$ as a column to M and set $k = k + 1$}
+		\EndIf
+		\EndFor
+		\EndWhile
+		\While{1}
+			\State Choose random subset of n vectors from $M$ and construct matrix $L$ whose columns are those vectors from $M$
+			\State Perform LLL basis reduction on L to get $UL = L'$, where $U$ is a uni-modular transformation matrix and $L'$ is LLL reduced.
+			\ForAll{$J=1,...,n$}
+				\State check if row $u_j$ of U has the same distribution as f and if $(a_1/2)\cdot u_j \bmod 2q$ has the same distribution as $2g+1$. Lastly verify if $a_1 \cdot u_j + a_2 \cdot (a_2/2)\cdot u_j \equiv q \bmod 2q$
+				\State
+				\Return $S = (u_j, (a_1/2)\cdot u_j \bmod 2q)$ if this is the case
+			\EndFor
+		\EndWhile
+	\end{algorithmic}
+\end{algorithm} 
 \subsection{Attacking Rejection Sampling} \label{rejection}
 When rejection sampling is used in the BLISS signature scheme, the side channel has to decide, if there was a table acces in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
 
@@ -151,8 +177,8 @@ So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in 
 
 EINRÜCKUNGEN NEU
 \begin{algorithm}
-	\caption{Cache attack on BLISS with Rejection sampling}
-	\label{algcdtattack}
+	\caption{Cache attack on BLISS with Rejection Sampling}
+	\label{algrctattack}
 	\begin{algorithmic}[1]
 		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. BLISS input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signatures $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses rejection sampling with small exponential table to sample noise polynomial y}
 		\Ensure{Secret key $S$}
