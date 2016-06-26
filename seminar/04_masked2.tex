@@ -3,7 +3,8 @@
 %
 
 \chapter{Additively Homomorphic ring-LWE Masking}
-Less than a year after \cite{maskedRing} (which has been described in the last Section) was published, Reparaz et. al. published a follow-up paper \cite{Reparaz2016} introducing a much easier approach for the masking of the \ac{ring-LWE} encryption scheme.\\
+Less than a year after \cite{maskedRing} (which has been described in the last Section) was published, Reparaz et. al. published a follow-up paper \cite{Reparaz2016} introducing a much easier approach for the masking of the \ac{ring-LWE} encryption scheme.
+
 In the following, the approach of said paper will be introduced and evaluated in terms of efficiency and side-channel attack resistance. In our description we again focus on the \ac{LPR} scheme, though the techniques are also applicable for other \ac{ring-LWE} encryption schemes.
 
 \section{Implementation}
@@ -11,14 +12,23 @@ For \ac{ring-LWE} masking, we make use of the fact that the \ac{LPR} encryption 
 \begin{equation}
 	decryption(\textbf{c}_1,\textbf{c}_2) \oplus decryption(\textbf{c}'_1,\textbf{c}'_2) = decryption(\textbf{c}_1 + \textbf{c}'_1,\textbf{c}_2 + \textbf{c}'_2)
 \end{equation}
-Now, we want to make use of the property of additive homomorphism for our masking scheme. This, again, focuses on the decryption function, as this is the part of the encryption scheme, where the secret key is used, which makes it a prime target for attackers.\\
+Now, we want to make use of the property of additive homomorphism for our masking scheme. This, again, focuses on the decryption function, as this is the part of the encryption scheme, where the secret key is used, which makes it a prime target for attackers.
+
 To randomize the decryption of \((\textbf{c}_1, \textbf{c}_2)\), we need to follow three simple steps:
 \begin{enumerate}
 \item Generate a random message \(\textbf{m}'\) unknown to the adversary
 \item Encrypt \(\textbf{m}'\) to \((\textbf{c}'_1, \textbf{c}'_2)\)
 \item Decrypt \((\textbf{c}_1+\textbf{c}'_1, \textbf{c}_2+\textbf{c}'_2)\) to receive \(\textbf{m} \oplus \textbf{m}'\)
 \end{enumerate}
-The masked message returned by this approach is \((\textbf{m}', \textbf{m} \oplus \textbf{m}')\), such that \(\textbf{m} = (\textbf{m} \oplus \textbf{m}') \oplus \textbf{m}'\).\\
+The masked message returned by this approach is \((\textbf{m}', \textbf{m} \oplus \textbf{m}')\), such that \(\textbf{m} = (\textbf{m} \oplus \textbf{m}') \oplus \textbf{m}'\).
+
 The advantage of this approach is, that no masked decoder is needed. For decoding, an unprotected decoder might be used without leaking any useful information for an attacker.
 
 \section{Evaluation}
+As we can precompute \(\textbf{m}'\) and \((\textbf{c}'_1, \textbf{c}'_2)\) due to the independency of \(\textbf{m}'\), the tradeoff in terms of efficiency seems to be pretty reasonably. Note that it was not possible to do any precomputations when using the masked decoder described in the previous Section.
+
+Furthermore, the complexity of the implementation of this approach is much lower compared to the other approach, which needs a carefully implemented masked decoder. However, the error rate of the new scheme is about a hundred times higher than the \ac{ring-LWE} encryption scheme with masking being turned off. This effect might be compensated by increasing the modulus \(q\) by one bit from 13 to 14 bits or by decreasing the standard deviation \(\sigma\) of the discrete Gaussian distribution.
+
+Although, straightforward first-order \ac{DPA} attacks do not immediately work on our masking approach, more refined ones are still possible. This is due to the fact, that the key itself is not masked. The masking is only making it harder for an attacker to model the power consumption for first-order \ac{DPA}. Using the same technique as before, the authors of \cite{Reparaz2016} showed that while first-order \ac{DPA} attacks on the decryption with the masks being turned off are easy to conduct, the same attack on the scheme with masking being turned on is not possible straight away. More details on this can be found in the corresponding paper.
+
+

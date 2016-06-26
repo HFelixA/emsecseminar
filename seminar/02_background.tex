@@ -5,8 +5,10 @@
 \chapter{Theoretical Background}
 
 \section{Notation}
-As we will only work with ideal lattices in our paper, all operations will be done within the ring \(R_q=\mathbb{Z}_q[x]/(f(x))\) with \(f(x)\) being an irreducible polynomial of degree \(n\) and all coefficients being reduced modulo \(q\).\\
-Polynomials will be written as bold lower case letters (\(\textbf{f}\)). As we will use the \textit{\ac{NTT}} for efficient polynomial multiplication within a ring \(R_q\), polynomials in the \textit{\ac{NTT}} domain will be written as \(\tilde{\textbf{f}}\). Vectors will be denoted with an arrow on top of them (\(\vec{x}\)), while matrices will be denoted by bold upper case letters (\(\textbf{A}\)). The entries of a vector \(\vec{x}\) will be called \(x_i\), with \(i\) specifying the position within the vector starting at 0.\\
+As we will only work with ideal lattices in our paper, all operations will be done within the ring \(R_q=\mathbb{Z}_q[x]/(f(x))\) with \(f(x)\) being an irreducible polynomial of degree \(n\) and all coefficients being reduced modulo \(q\).
+
+Polynomials will be written as bold lower case letters like \(\textbf{f}\). As we will use the \textit{\ac{NTT}} for efficient polynomial multiplication within a ring \(R_q\), polynomials in the \textit{\ac{NTT}} domain will be written as \(\tilde{\textbf{f}}\). Vectors will be denoted with an arrow on top of them (\(\vec{x}\)), while matrices will be denoted by bold upper case letters (\(\textbf{A}\)). The entries of a vector \(\vec{x}\) will be called \(x_i\), with \(i\) specifying the position within the vector starting at 0.
+
 The notation for the \(l_p\) norm of a vector \(\vec{x}\) will be \(\|\vec{x}\|_p\), only with the exception of the \(l_2\) norm, which will be referred to as \(\|\vec{x}\|=\sqrt{\sum_{i} x_i^2}\).
 
 \section{Ideal Lattices}
@@ -14,11 +16,13 @@ A lattice \(\Lambda\) is discrete subgroup of \(\mathbb{R}^n\) that is defined a
 \begin{equation}
 	\Lambda(\vec{b}_1,...,\vec{b}_m)=\left \{ \displaystyle \sum_{i=1}^{m} x_i \vec{b}_i \: \middle | \: x_i \in \mathbb{Z} \right \}
 \end{equation}
-The set \(\{\vec{b}_1,...,\vec{b}_m\}\) of those vectors is called the basis of that lattice, which commonly is represented by a matrix \(\textbf{B}=(\vec{b}_1,...,\vec{b}_m)\).\\
+The set \(\{\vec{b}_1,...,\vec{b}_m\}\) of those vectors is called the basis of that lattice, which commonly is represented by a matrix \(\textbf{B}=(\vec{b}_1,...,\vec{b}_m)\).
+
 Furthermore, an ideal lattice is is lattice that corresponds to ideals in a ring \(R_q\). From this it follows that we can deal with polynomials instead of matrices, which makes arithmetics used for cryptographic applications much more efficient. In our paper we will confine ourselves to those ideal lattices, as most of the current work in that area focuses around them. For more on the topic of ideal lattices, see \cite{cryptoeprint:2012:230}.
 
 \section{Ring Learning with Errors Problem}
-The \acf{ring-LWE} has been introduced in \cite{cryptoeprint:2012:230} in 2012. There are two instances of the \ac{ring-LWE}, a search one and a decisional one. For both of them, we can state that there is a given \(\textbf{s} \in R_q\). Next, an error polynomial \(\textbf{e}_i \in R_q\) is sampled from the discrete Gaussian distribution \(\mathcal{N}_\mathbb{Z}^{n} (0, \sigma^2)\) and another polynomial \(\textbf{a}_i \in R_q\) is sampled uniformy at random. Finally, a polynomial \(\textbf{b}_i\) is computed as \(\textbf{b}_i = (\textbf{a}_i \cdot \textbf{s}) + \textbf{e}_i\).\\
+The \acf{ring-LWE} has been introduced in \cite{cryptoeprint:2012:230} in 2012. There are two instances of the \ac{ring-LWE}, a search one and a decisional one. For both of them, we can state that there is a given \(\textbf{s} \in R_q\). Next, an error polynomial \(\textbf{e}_i \in R_q\) is sampled from the discrete Gaussian distribution \(\mathcal{N}_\mathbb{Z}^{n} (0, \sigma^2)\) and another polynomial \(\textbf{a}_i \in R_q\) is sampled uniformy at random. Finally, a polynomial \(\textbf{b}_i\) is computed as \(\textbf{b}_i = (\textbf{a}_i \cdot \textbf{s}) + \textbf{e}_i\).
+
 For the \textit{search} \ac{ring-LWE} problem, one needs to find the unknown polynomial \(\textbf{s}\) for a given pair \((\textbf{a}_i, \textbf{b}_i)\). The \textit{decisional} \ac{ring-LWE} problem is about distinguishing between pairs \((\textbf{a}_i, \textbf{b}_i)\) that have actually been computed the way described before and pairs \((\textbf{a}_i, \textbf{b}_i)\) that have been sampled uniformly at random in \(R_q\).
 
 \section{Discrete Gaussian Distribution}
@@ -49,8 +53,20 @@ In our paper we focus on the encryption scheme published in \cite{cryptoeprint:2
     \end{cases}
 \end{equation}
 
-\subsection{BLISS Signature Scheme}
+\subsection{BLISS}
+The \acf{BLISS} is a signature algorithm based on lattice cryptography, that was proposed in \cite{bliss}. We will just povide the basic algortihms of the signature scheme, for the security proof and the motivation of the construction we would refer you to the original paper.
+
+\ac{BLISS} uses the following parameters: dimension \(n\), modulus \(q\) and standard deviation \(\sigma\). Furthermore, is makes use of a cryptographic hash function \(H\), which outputs a \(n\) bit binary vector with weight \(\kappa\). The density of the polynomials belonging to the secret key \(\textbf{S}\) is determined by the parameters \(d_1\) and \(d_2\) and \(d\) determines the length of the second signature component \(\textbf{z}_2^\dagger\).
+
+\textbf{Key Generation:} The keys generated by Algorithm \ref{BLISSKeyGen} are correct due to the following equation:
+\begin{equation}
+    \textbf{a}_1 \cdot \textbf{s}_1 + \textbf{a}_2 \cdot \textbf{s}_2 = 2 \textbf{a}_q \cdot \textbf{f} + (q - 2) \cdot (2 \textbf{g} + 1) \equiv 2 (2 \textbf{g} + 1) + (q - 2) (2 \textbf{g} + 1) \equiv q \; mod \; 2q
+\end{equation}
+
+An attacker might validate a candidate for \(\textbf{s}_1 = \textbf{f}\) by verifying the distributions of \(\textbf{f}\), \(\textbf{a}_q \cdot \textbf{f} \equiv 2 \textbf{g} + 1\) mod \(2q\) and \(\textbf{a}_1 \cdot \textbf{f} + \textbf{a}_2 \cdot (\textbf{a}_q \cdot \textbf{f}) \equiv q\) mod \(2q\).
+
 \begin{algorithm}
+    \label{BLISSKeyGen}
     \caption{\textsc{BLISS Key Generation}}
     \begin{algorithmic}[1]
         \Ensure{BLISS key pair \((\textbf{A},\textbf{S})\) with public key \(\textbf{A}=(\textbf{a}_1,\textbf{a}_2) \in R^2_{2q}\) and secret key \(\textbf{S}=(\textbf{s}_1,\textbf{s}_2) \in R^2_{2q}\), such that \(\textbf{AS}=\textbf{a}_1 \cdot \textbf{s}_1 + \textbf{a}_2 \cdot \textbf{s}_2 \equiv q\) mod \(2q\)}
@@ -65,7 +81,9 @@ entries in \(\{\pm 2\}\)}
     \end{algorithmic}
 \end{algorithm}
 
+\textbf{Signature Generation:} The signature algorithm given in Algo. \ref{BLISSSig} uses the parameters \(p = \lfloor 2q/2^d \rfloor\) (the \(d\) highest order bits of \(2q\)) and a constant \(\zeta = (q-2)^{-1}\) mod \(2q\). In the following, the \(d\) highest order bits of a value \(x\) will be denoted as \(\lfloor x \rceil _d\).
 \begin{algorithm}
+    \label{BLISSSig}
     \caption{\textsc{BLISS Signature Algorithm}}
     \begin{algorithmic}[1]
     	\Require{Message \(\mu\), public key \(\textbf{A}=(\textbf{a}_1,q-2)\), secret key \(\textbf{S}=(\textbf{s}_1,\textbf{s}_2)\)}
@@ -82,7 +100,9 @@ entries in \(\{\pm 2\}\)}
     \end{algorithmic}
 \end{algorithm}
 
+\textbf{Signature Verification:} Algorithm \ref{BLISSVer} shows the signature verification. We want to stress that reductions modulo \(2q\) are done before reductions modulo \(p\).
 \begin{algorithm}
+    \label{BLISSVer}
     \caption{\textsc{BLISS Verification Algorithm}}
     \begin{algorithmic}[1]
     	\Require{Message \(\mu\), public key \(\textbf{A}=(\textbf{a}_1,q-2)\), signature \((\textbf{z}_1, \textbf{z}_2^\dagger, \textbf{c})\)}
@@ -96,5 +116,6 @@ entries in \(\{\pm 2\}\)}
 \end{algorithm}
 
 \section{Side-Channel Attack Terminology}
-Side-channel attacks use leaked information from physical implementations of cryptographic algorithms to conclude secret information like encryption keys. Such leakage could e.g. be the power consumption during cryptographic operations. One type of attacks that makes use of leakages through power consumption is \textit{\ac{DPA}}.\\
+Side-channel attacks use leaked information from physical implementations of cryptographic algorithms to conclude secret information like encryption keys. Such leakage could e.g. be the power consumption during cryptographic operations. One type of attacks that makes use of leakages through power consumption is \textit{\ac{DPA}}.
+
 To perform a DPA, one needs to correlate a leakage with a prediction made on a special value that depends on both, the secret key and the plaintext. Such a value is called a \textit{sensitive variable}. A common countermeasure to \textit{\ac{DPA}} is masking, where sensitives variables are randomly split into \(d\) shares. A masking approach with \(d\) shares is reffered to as a \((d-1)\)-th order masking, as \(d-1\) shares are picked randomly and the last share is computed in a way, that the combination of all \(d\) shares equals the shared sensitive variable. To defeat this kind of countermeasures, the class of \textit{\ac{HO-DPA}} has been introduced. To overcome \((d-1)\)-th order masking, \(d\)-th order \textit{\ac{DPA}} is needed, which can be done by combining the leakage of \(d\) different signals that correspond to the \(d\) shares of the sensitive variable. Theoretically, higher order masking can always be defeated by HO-DPA. However, the difficulty of \textit{\ac{HO-DPA}} is growing exponentially due to noise effects. In practice, first order masking is most commonly used, thus there is a big focus on second order \textit{\ac{DPA}} in research.
