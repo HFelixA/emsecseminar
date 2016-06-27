@@ -137,7 +137,7 @@ The victim then has to generate $N$ signatures $(z_j, c_j), j= 1,...,N$, which a
 \begin{equation*}
 	z_{ji} = y_{ji} + (-1)^{b_j}\langle s,c_ji \rangle
 \end{equation*}
-Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \gamma_1}$, the attacker adds $\xi_k = c_{ji}$ to a list of good vectors. With enough vectors $\xi_k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1 \le k \le n$ the matrix $L \in \{-1,0,1\}^{n \times n}$ can be formed. The column vectors $\xi_k$ satisfy $sL = v$, where $v$ is a unknown, but short, vector with norm about $\sqrt{\alpha n}$ in the lattice spanned by the rows of $l$. A lattice reduction algorithm, like LLL, can search for $v$ and output a uni-modular matrix $U$ with $UL = L'$. Every row of $U$ (or its rotations) is tested if it is a candidate for $s=f$ by checking against the public key.
+Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \gamma_1}$, the attacker adds $\xi_k = c_{ji}$ to a list of good vectors. With enough vectors $\xi_k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1 \le k \le n$ the matrix $L \in \{-1,0,1\}^{n \times n}$ can be formed. The column vectors $\xi_k$ satisfy $sL = v$, where $v$ is a unknown, but short, vector with norm about $\sqrt{\alpha n}$ in the lattice spanned by the rows of $L$. A lattice reduction algorithm, like LLL, can search for $v$ and output a uni-modular matrix $U$ with $UL = L'$. Every row of $U$ (or its rotations) is tested if it is a candidate for $s=f$ by checking against the public key.
 
 Because this last step is not always successful, not only $n$ but $m>n$ vectors $\xi_k$ are collected and a random subset forms the input for LLL.
 
@@ -204,7 +204,7 @@ EINRÜCKUNGEN NEU
 \newpage
 \section{Attacking Sampling Algorithms with a Perfect Side Channel}
 The paper \cite{cryptoeprint:2016:300} provided experimental results for a perfect side-channel attack using the procedure explained. This requires the attacker to get every cache line of every table look-up while computing $y$ in CDT and rejection sampling algorithms. The victim is assumed to sign random messages and the signatures are collected by the attacker. Cache lines are 64 byte and each element is 8 byte. 
-To fulfill this requirements, the authors of \cite{cryptoeprint:2016:300} modified the \textit{research oriented} C++ implementation published by the BLISS authors \cite{blisshp}. NTL was used for LLL reductions and kernel calculations.
+To fulfill this requirements, the authors of \cite{cryptoeprint:2016:300} modified the \textit{research oriented} C++ implementation published by the BLISS authors \cite{blisshp}. Tests were performed on a 4.1 GHz AMD FX-8350 Eight-Core CPU. NTL was used for LLL reductions and kernel calculations.
 \subsection{Perfect Side Channel Attack on CDT Sampling}
 A perfect side channel yields the attacker the values $\lfloor u/8 \rfloor$ and $\lfloor I_z/8 \rfloor$ of the table accesses for $I[u]$ and $T[I_z]$, the full cache line for a specific value. 
 
@@ -291,4 +291,14 @@ with $K= \lfloor \frac{\sigma}{\sigma_2}+1\rfloor$ and tail-cut $r\ge 1$. The av
 \caption{Experimental results of an attack on BLISS with rejection sampling using a perfect side channel}
 \label{tab:rejectionperfect}
 \end{table}
+\newpage
+\section{Attacking Sampling Algorithms with a Real Side Channel}
+The experiments explained above used a perfect side channel to get every memory information needed to perform the attack. In the following the proof of concept implementation using a realistic FLUSH+RELOAD attack from \cite{cryptoeprint:2016:300} will be summarized.
+\subsection{Attacking CDT Sampling}
+Because of various CPU optimizations, like prefetchers, real world implementations cannot assume to have perfectly aligned cache lines or that every loaded cache line was accessed. The \textit{spatial prefetcher} for example pairs two adjacent lines and loads both, if one is accessed. Because this might lead to false positives, only cache weaknesses spanning two unpaired lines can be exploited. \\
+The \verb|clflush| instruction is used to flush the monitored cache lines before every $y_i$ is sampled and the access time is measured afterwards. Compared to a reference loadtime, we can determine if an access happened. For simplicity, only one observed cache weakness was monitored in the experiments.\\
+Using an Intel i5-3470 processor, 50 attacks on the last-jump weakness $\{\gamma_1, \gamma_2\} = \{55,56\}$ in BLISS-I were performed an it was possible to recover the private key 46 times. To collect the recommended $m = 2n = 1024$ usable equations, on average $3438$ signatures were needed. Only 5 runs of LLL were performed, still a success rate of $92\%$ shows feasibility of the attack. This might vary with different CPUs, because of different prefetchers.
+\subsection{Attacking Rejection Sampling}
+Because the attack on rejection sampling only needs to know, if $ET$ was accessed at all and the spatial prefetcher, who will reload odd cache lines if the even ones are accessed, flushing all cache lines and reloading only the even ones, covers the whole table $ET$. Randomization, like in CDT, was needed in this case, because the side channel was not a perfect one and some columns $\langle s, c_i \rangle \neq 0$ in L were likely collected. So again, more than n columns were collected an LLL was used to handle the errors. 
+With an Intel i7-5650U again 50 attacks against BLISS-I were performed and 3 out of 6 cache lines were monitored. The private key could be recovered 44 times, while on average 3294 signatures wre needed to collect $m = n +100 = 612$ equations. LLL was performed 5 times, similar to the CDT attack.
 \section{Evaluation}

@@ -19,7 +19,7 @@ Section 3 will deal with the ring-LWE encryption scheme and will be split into t
 
 A different approach to masking of the \ac{ring-LWE} encryption scheme will be presented in Section 4 of our paper, which will as well be split into a description of the proposed scheme and an evaluation. Furthermore, the second masking scheme will be compared to the first one in respect to efficiency and complexity.
 
-Section 5 will discuss the \verb|FLUSH+RELOAD| cache attacks on the Gaussian sampler used in the \acs{BLISS} signature scheme. This part will start with a description of a perfect side channel attack on two Gaussian sampling algorithms, namely the cumulative distribution function (CDT sampling) and rejection sampling. This will be followed by an evaluation of the \verb|FLUSH+RELOAD| attacks on an actual BLISS implementation, while running on modern CPUs.
+Section 5 will discuss two different Gaussian samplers for use in the BLISS signature scheme and their vulnerability to the \verb|FLUSH+RELOAD| cache attack. This part will start with a description of two Gaussian samplers proposed by the BLISS authors, namely the cumulative distribution function (CDT sampling) and rejection sampling, followed by the results of a perfect side channel attack on the two sampling algorithms. This will be followed by an short evaluation of the \verb|FLUSH+RELOAD| attacks on an actual BLISS implementation, while running on modern CPUs.
 
 Furthermore, in Section 6 we will be presenting two measures used for blinding polynomial multiplication and Gaussian sampling, which might help against the attacks described in Section 5.
 
