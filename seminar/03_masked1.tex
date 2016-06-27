@@ -15,7 +15,7 @@ We start by splitting the secret key \(\textbf{s}\) into two shares \(\textbf{s}
 \begin{equation}
 	\textbf{a}=\textsc{INTT}(\tilde{\textbf{s}} \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2)=\textsc{INTT}(\tilde{\textbf{s}}' \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2)+\textsc{INTT}(\tilde{\textbf{s}}'' \cdot \tilde{\textbf{c}}_1)
 \end{equation}
-This enables us to split the whole equation into two branches, calculating \(\textbf{m}'_{enc}\) and \(\textbf{m}''_{enc}\) in the following way:
+This enables us to split the whole equation into two branches, calculating \(\textbf{a}'\) and \(\textbf{a}''\) in the following way:
 \begin{equation}
 	\textbf{a}'=\textsc{INTT}(\tilde{\textbf{s}}' \cdot \tilde{\textbf{c}}_1+\tilde{\textbf{c}}_2),\:\textbf{a}''=\textsc{INTT}(\tilde{\textbf{s}}'' \cdot \tilde{\textbf{c}}_1)
 \end{equation}
@@ -26,7 +26,7 @@ However, the \(\textsc{Decode}(a_{i})\) function in the decryption stage of the 
 \subsection{Masked Decoder}
 This Section briefly describes a probabilistic masked decoder. We recall, that the \(i\)-th element of \(\textit{a}\) is called \(a_i\) and the shares \((a'_i,a''_i)\) of such an element are chosen in a way, that \(a'_i + a''_i = a_i\) (mod \(q\)). To keep it simple, we will refer to an arbitrary \(a_i\) as \(a\), the same follows for its shares.
 
-For our masked decoder, we do not need to know the exact values of \(a'\) and \(a''\) to compute \(\textsc{Decode}(a)\). The following example will help us to lay down some rules for the decoder: Given \((a', a'')\) with \(0 < a' < q/4\) and \(q/4 < a'' < q/2\). Then know that for \(a=a'+a''\) it follows, that \(q/4 < a < 3q/4\) and therefore \(\textsc{Decode}(a)=1\). We only need to know the most significant bits of \(a'\) and \(a''\) to determine, which values they are bounded by.
+For our masked decoder, we do not need to know the exact values of \(a'\) and \(a''\) to compute \(\textsc{Decode}(a)\). The following example helps us to lay down some rules for the decoder: Given \((a', a'')\) with \(0 < a' < q/4\) and \(q/4 < a'' < q/2\). Then know that for \(a=a'+a''\) it follows that \(q/4 < a < 3q/4\) and therefore \(\textsc{Decode}(a)=1\). We only need to know the most significant bits of \(a'\) and \(a''\) to determine, which values they are bounded by.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{maskedDecoder_1.png}
@@ -40,7 +40,7 @@ Figure \ref{maskedDecoder_1} shows our example from above on the left. We can us
 \item \(q/4 < a' < q/2\), \(q/2 < a'' < 3q/4\) \(\implies\) \(a \in (0,q/4) \cup (3q/4,q)\) \(\implies\) \(\textsc{Decode}(a)=0\)
 \item \(3q/4 < a' < q\), \(0 < a'' < q/4\) \(\implies\) \(a \in (0,q/4) \cup (3q/4,q)\) \(\implies\) \(\textsc{Decode}(a)=0\)
 \end{itemize}
-With swapping \(a'\) and \(a''\) in the above rules, one can obtain another four rules. From the rules it follows, that we only need to know the quadrant of each \(a'\) an \(a''\) to infer the output of \(\textsc{Decode}(a)\). However, this does not work for all cases, as Figure \ref{maskedDecoder_1} shows. We can actually only apply those rules in half of the possible cases.
+With swapping \(a'\) and \(a''\) in the above rules, one can obtain another four rules. From the rules it follows that we only need to know the quadrant of each \(a'\) an \(a''\) to infer the output of \(\textsc{Decode}(a)\). However, this does not work for all cases, as Figure \ref{maskedDecoder_1} shows. We can actually only apply those rules in half of the possible cases.
 
 So, what happens if our \((a', a'')\) does not match any rule? We simply need to refresh the splitting by computing \(a' = a' + \Delta_1\) and \(a'' = a'' - \Delta_1\) with \(\Delta_i \in \mathbb{Z}_q\). From \((a' + \Delta_1) + (a'' - \Delta_1) = a' + a'' = a\) it follow, that \(a\) stays unchanged by that refresh. Now that we have a fresh pair \((a',a'')\), we can again try to apply our rules from above. This process can be repeated until all shares have been decoded. Note, that a new \(\Delta_i\) should be chosen for each iteration. About half of the \(a',a''\) are decoded per iteration, so that the amount of decoded shares rises exponentially with the number of iterations. The authors of \cite{maskedRing} propose a number of \(N = 16\) iterations for a satisfactory result.
 \begin{figure}[H]
@@ -57,7 +57,7 @@ A possible hardware implementation of such a masked decoder is shown in Figure \
 \section{Evaluation}
 Starting with efficiency, Reparaz et. al. showed that this implementation is at least 1.9x times better on a Virtex-2 FPGA than an unprotected high-speed elliptic curve scalar multiplier architecture introduced in \cite{Rebeiro2012}.
 
-Furthermore, as both, the \textit{\ac{LPR} \ac{ring-LWE}} encryption scheme and our masked decoder, are probabilistic, there will always be a chance for errors occurring during decoding. The global error rate of decoding rises significantly when using our masked decoder instead of a deterministic decoder. To offset this effect, we can adapt the number of iterations for the masked decoder. While for \(N=3\) iterations the global error rate is about \(49\) times larger than when using a deterministic decoder, \(N=16\) iterations yield a global error rate that is almost identical with the one of a deterministic decoder. Further improvement could be achieved by increasing the number of iterations again, but this would lead to a significantly higher cycle count and thus to a much more inefficient implementation.
+Furthermore, as both, the \textit{\ac{LPR} \ac{ring-LWE}} encryption scheme and our masked decoder, are probabilistic, there will always be a chance for errors occurring during decoding. The global error rate of decoding rises significantly when using our masked decoder instead of a deterministic decoder. To offset this effect, we can adapt the number of iterations for the masked decoder. While for \(N=3\) iterations the global error rate is about \(49\) times higher than when using a deterministic decoder, \(N=16\) iterations yield a global error rate that is almost identical with the one of a deterministic decoder. Further improvement could be achieved by increasing the number of iterations again, but this would lead to a significantly higher cycle count and thus to a much more inefficient implementation.
 
 For our evaluation in terms of side-channel attack soundness, we assume the attacker knows the details of our implementation and is aware of the rest of the key while guessing a subkey. Our evaluation will follow three steps: First, we perform a first-order key recovery attack with our source of randomness (\textit{\acs{PRNG}}) turned off. This attack will be successful, showing that our setting is correct. In the second step, we will turn on the PRNG and repeat the same attack, but it should not be successful in this case. Finally, we perform a second-order attack to confirm the correctness of the first two steps.
 \begin{figure}[H]
