@@ -6,7 +6,7 @@
 \label{bliss}
 
 \section{Gaussian Sampling} %Eventuell zur Theorie
-The Gaussian Sampler is an important part for the security of many lattice based cryptosystems, because it is used to generate important random values. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. In this chapter we will introduce two different Gaussian Samplers and evaluate side channel attacks as described in \cite{cryptoeprint:2016:300}.
+The Gaussian Sampler is an important part for the security of many lattice based cryptosystems, because it is used to generate important values. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. There are many papers dealing with various ways of discrete gaussian sampling such as \cite{cryptoeprint:2010:088}, but in this chapter we will introduce the two different Gaussian Samplers and side channel attacks as described in \cite{cryptoeprint:2016:300}.
 \subsection{CDT Sampling}
 Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[0, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
 
