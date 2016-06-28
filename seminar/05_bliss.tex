@@ -1,12 +1,8 @@
-%
-% Sample conclusion of your thesis
-%
-
 \chapter{Flush+Reload Cache Attack on Bliss}
 \label{bliss}
 
-\section{Gaussian Sampling} %Eventuell zur Theorie
-The Gaussian Sampler is an important part for the security of many lattice based cryptosystems, because it is used to generate important values. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. There are many papers dealing with various ways of discrete gaussian sampling such as \cite{cryptoeprint:2010:088}, but in this chapter we will introduce the two different Gaussian Samplers and side channel attacks as described in \cite{cryptoeprint:2016:300}.
+\section{Gaussian Sampling}
+The Gaussian Sampler is an important part for the security of many lattice based cryptosystems, because it is used to generate important values. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. There are many papers dealing with various ways of discrete Gaussian sampling such as \cite{cryptoeprint:2010:088}, but in this chapter we will introduce the two different Gaussian Samplers and side channel attacks as described in \cite{cryptoeprint:2016:300}.
 \subsection{CDT Sampling}
 Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[0, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
 
@@ -44,13 +40,13 @@ The binary search in this sampling method can take some time, so one can speed i
  	\end{algorithmic}
  \end{algorithm}
 \subsection{Rejection Sampling}
-Rejection Sampling basically accepts a sampled uniformly random integer $y \in [-r\sigma, r\sigma]$ with probability $p_\sigma(y)/p_\sigma(\mathbb{Z})$. This is done by sampling a uniformly random value $r \in [0,1)$ and accepting the unformly random $y$ if $r \le p_\sigma(y)$. This procedure can be quite expensive, because $p_\sigma(y)$ has to be calculated to a high precision and even then the rejection rate may be quite high.
+Rejection Sampling basically accepts a sampled uniformly random integer $y \in [-r\sigma, r\sigma]$ with probability $p_\sigma(y)/p_\sigma(\mathbb{Z})$. This is done by sampling a uniformly random value $r \in [0,1)$ and accepting the uniformly random $y$ if $r \le p_\sigma(y)$. This procedure can be quite expensive, because $p_\sigma(y)$ has to be calculated to a high precision and even then the rejection rate may be quite high.
 
-The authers of \cite{bliss} which introduced BLISS proposed a more efficient rejection sampling algorithm, which will be used in the following chapters.%kann man das so schreiben
+The authors of \cite{bliss} (who introduced \ac{BLISS}) proposed a more efficient rejection sampling algorithm, which will be used in the following chapters.
 
 This algorithm reduces the amount of rejected samples significantly. It begins with sampling a value $x$ according to the binary discrete Gaussian distribution $D_{\sigma 	_{2}}$ with $\sigma _2 = \frac{1}{2 ln 2}$. Uniformly random bits can be used to do this efficiently. $y = Kx + z, z \in \{0,...,K-1\}$ is then uniformly random sampled and $K = \lfloor\frac{\sigma}{\sigma _2} + 1\rfloor$ is distributed according to the targeted discrete Gaussian distribution $D_\sigma$ by rejecting when $b = \exp (−z(z + 2Kx)/(2σ^2)) = 0$ holds.
 
-This last step still requires some computing because of the exponential value $b$, but the authors provided a more efficiant algorithm for this, too. %algorithmen einfügen
+This last step still requires some computing because of the exponential value $b$, but the authors provided a more efficient algorithm for this, too.
  \begin{algorithm}
  	\caption{Sampling from $D^+_{K_{\sigma}}$ for $K\in\mathbb{Z}$}
  	\label{algrjt1}
@@ -98,7 +94,7 @@ This last step still requires some computing because of the exponential value $b
   \end{algorithm}
 
 \section{The FLUSH+RELOAD Cache Attack}
-The attack used in \cite{cryptoeprint:2016:300} is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the cpu core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
+The attack used in \cite{cryptoeprint:2016:300} is the FLUSH+RELOAD cache attack. This attack abuses the fact, that modern CPUs feature multiple different cache levels, for example L1 cache. This is the fastest and smallest cache level and located closest to the CPU core. The next level, L2 cache, is bigger and slower than L1, L3 is even bigger and slower than L2, etc.
 
 If the CPU has to access a memory address, it looks for the corresponding memory block in higher levels first. If the block is found, a \textit{cache hit}, the data is accessed. But in case of a \textit{cache miss}, it starts to look for the memory block on lower cache levels down to the system memory. If the corresponding block is found in lower levels, the processor \textit{evicts} a cache line in the higher memory and places the found memory line there, to speed up future access on the same memory block.
 
@@ -112,8 +108,7 @@ The CDT sampling algorithm with an interval table $I$ and a table with actual va
 
 A cache attack as described above can only yield the cache lines of index $u$ of the interval table and the cache line of index $I_z$ of the look-up in $T$. This leaves a range of values for $|y_i|$, additionally the sign of $y_i$is not stored in the table. But the combination of both table look-ups can yield precise information, too.
 Two possible combinations of table accesses are \textit{intersection} and \textit{last-jump}. \\
-The intersection cache weakness intersects knowledge about index $u$ in $I$ and the access $T[I_z]$. Sometimes values in the range of intervalls are largly not overlapping with the range of values from $T[I_z]$, so the intersection %schnittmenge?!
-narrows down the possible values. If, for example, the sample $|y_i|$ has to be in the set $S_1 = \{0,1,2,3,4,5,6,7,8\}$ according to the cache line $I[u]$, but $T[I_z]$ reveals $|y_i|$ must be in $S_2 = \{8,9,10,11,12,13,14,15\}$, we can learn $|y_i| \in S_1 \cap S_2 = \{7,8\}$.\\
+The intersection cache weakness intersects knowledge about index $u$ in $I$ and the access $T[I_z]$. Sometimes values in the range of intervals are largely not overlapping with the range of values from $T[I_z]$, so the intersection narrows down the possible values. If, for example, the sample $|y_i|$ has to be in the set $S_1 = \{0,1,2,3,4,5,6,7,8\}$ according to the cache line $I[u]$, but $T[I_z]$ reveals $|y_i|$ must be in $S_2 = \{8,9,10,11,12,13,14,15\}$, we can learn $|y_i| \in S_1 \cap S_2 = \{7,8\}$.\\
 Another abusable weakness is called \textit{last-jump} and can be used if elements of an interval $I[u]$ are spread over two cache lines of $T$. For example interval $I[u] = {5,6,7,8,9}$ is divided over cache-lines $T_1 = \{0,1,2,3,4,5,6,7\}$ and $T_2 = \{8,9,10,11,12,13,14,15\}$. A binary search will start at the value $7$ in the always accessed cache-line $T_1$, but cache-line $T_2$ is only accessed, if $|y_i| \in \{8,9\}$.\\
 \cite{cryptoeprint:2016:300} restricted the patterns even more: 
 \begin{itemize}
@@ -148,7 +143,7 @@ Because this last step is not always successful, not only $n$ but $m>n$ vectors 
 		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. BLISS input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signature polynomials $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses CDT sampling with tables $T, I$ for noise polynomial $y$. Cache weakness that allows to determine if coefficient $y_i \in \{\gamma_1,\gamma_2\}$ of $y$, and when this is the case, the value of $y_i$, is biased towards $\gamma_1$}
 		\Ensure{Secret key $S$}
 		\State{Let $k = 0$ be the number of vectors gained so far and let $M=[]$ be an empty list of vectors}
-		\While{$k<m$ (m vectors before randomising LLL)}
+		\While{$k<m$ (m vectors before randomizing LLL)}
 		\State{Collect signature $(z_1, z_2^\dagger, c)$ together with cache information for each coefficient $y_i$ of noise polynomial $y$}
 		\For{$i=1,...,n$}
 		\If{$y_i \in \{\gamma_1, \gamma_2\}$ (according to cache information), and $z_{1i} = \gamma_1$}
@@ -168,17 +163,17 @@ Because this last step is not always successful, not only $n$ but $m>n$ vectors 
 	\end{algorithmic}
 \end{algorithm} 
 \subsection{Attacking Rejection Sampling} \label{rejection}
-When rejection sampling is used in the BLISS signature scheme, the side channel has to decide, if there was a table acces in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
+When rejection sampling is used in the \ac{BLISS} signature scheme, the side channel has to decide, if there was a table access in the $ET$ table. The attack exploits the small size of the $ET$ table, which leaks very precise information about the sampling process.
 
 Depending on the bit $i$ of input $x$, $ET[i]$ is accessed, if $x = 0$, no table look-up is performed. If the attacker detects this, he knows $z=0$ is the sampled value in step 2 in algorithm \ref{algrjt1}. In this case the attacker can assume $y \in \{0, \pm K, \pm 2K,...\}$ for usable cache access patterns.
 
-So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in \{0,...,n-1\}$ of the noise polynomial y. Because anyone can check if $max|\langle s,c \rangle |\le \kappa < K$ with the public parameters, $y_i$ can be determined completely with the signature vector $z$. With $N$ more signatures $(z_j, c_j), j =1,...,N$, the attacker can search for  $y_{ji} \in \{0, \pm K, \pm 2K,...\}$ ($y_{ji}$ means the ith coefficient of $y_j$). If the attacker additionally sees, that $z_{ji} = y_{ji}$, he knows $\langle s, c_{ji} \rangle = 0$. Such vector is a \textit{good vector} for use in the attack and $\zeta _k = c_{ji}$ is saved for later (some known $y_{ji}$ will be discarded, if they dont satisfy the necessary requirements). With $n$ of these vectors $\xi _k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1\le k \le n$ a matrix $L \in \{-1,0,1\}^{nxn}$ can be formed. The column vectors $\xi_k$ satisfy $sL = 0$ (0 is the all-zero vector) and most likely the only dependency of $\xi_k$ is introduced by s, so s is the only kernel vector. There is no need to randomize this process, because the all-zero vector is used.
+So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in \{0,...,n-1\}$ of the noise polynomial y. Because anyone can check if $max|\langle s,c \rangle |\le \kappa < K$ with the public parameters, $y_i$ can be determined completely with the signature vector $z$. With $N$ more signatures $(z_j, c_j), j =1,...,N$, the attacker can search for  $y_{ji} \in \{0, \pm K, \pm 2K,...\}$ ($y_{ji}$ means the i-th coefficient of $y_j$). If the attacker additionally sees, that $z_{ji} = y_{ji}$, he knows $\langle s, c_{ji} \rangle = 0$. Such vector is a \textit{good vector} for use in the attack and $\zeta _k = c_{ji}$ is saved for later (some known $y_{ji}$ will be discarded, if they do not satisfy the necessary requirements). With $n$ of these vectors $\xi _k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1\le k \le n$ a matrix $L \in \{-1,0,1\}^{nxn}$ can be formed. The column vectors $\xi_k$ satisfy $sL = 0$ (0 is the all-zero vector) and most likely the only dependency of $\xi_k$ is introduced by s, so s is the only kernel vector. There is no need to randomize this process, because the all-zero vector is used.
 
 \begin{algorithm}
 	\caption{Cache attack on BLISS with Rejection Sampling}
 	\label{algrctattack}
 	\begin{algorithmic}[1]
-		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. BLISS input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signatures $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses rejection sampling with small exponential table to sample noise polynomial y}
+		\Require{Access to cache memory of a victim with a key-pair $(A,S)$. \ac{BLISS} input parameters $n, \sigma, q, \kappa$ with $\kappa <K$. Access to signatures $(z_1, z_2^\dagger, c)$ produced using $S$. Victim uses rejection sampling with small exponential table to sample noise polynomial y}
 		\Ensure{Secret key $S$}
 		\State{Let $k = 0$ be the number of vectors gained so far and let $M=[]$ be an empty list of vectors}
 		\While{$k<n$}
@@ -195,7 +190,7 @@ So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in 
 			\State{}
 		\Return{$S = (u_j, (a_1/2)\cdot u_j \bmod 2q)$ if this is the case}
 		\EndFor
-		\State{Remove a random entry from M, put $k = k - 1$, goto step 2}
+		\State{Remove a random entry from M, put $k = k - 1$, go to step 2}
 	\end{algorithmic}
 \end{algorithm}   
 
@@ -209,7 +204,7 @@ A perfect side channel yields the attacker the values $\lfloor u/8 \rfloor$ and 
 Because not every cache line contains a intersection or last-jump weakness, a one-time brute force search over the look-up tables reveals cache lines, which are exploitable, by analyzing the structure and applying the biased restriction $\alpha \le 0.1$
 
 For each BLISS parameter set at least one usable cache weakness can be found, which can be abused. 
-The attacker then collects $m$ coefficient vectors $c_j$ and runs LLL up to $t = 2(m-n)+1$ times searching for s. A bigger value $t$ is not likely to have better success probabilities, because the randomly constructed lattices have overlapping base vectors, so the authors of the paper considered a experiment failed after this number of tries. Each experiment (with different parameters and different sizes of $m$) was performed 1000 times to measure the success probability $p_{successs}$, the average number of required signatures $\bar{N}$ to get $m$ usable challenges and the average length of $v$, if one was found.
+The attacker then collects $m$ coefficient vectors $c_j$ and runs LLL up to $t = 2(m-n)+1$ times searching for s. A bigger value $t$ is not likely to have better success probabilities, because the randomly constructed lattices have overlapping base vectors, so the authors of the paper considered an experiment failed after this number of tries. Each experiment (with different parameters and different sizes of $m$) was performed 1000 times to measure the success probability $p_{success}$, the average number of required signatures $\bar{N}$ to get $m$ usable challenges and the average length of $v$, if one was found.
 The expected number of needed signatures is:
 \begin{equation*}
 \mathbb{E}[N] = \frac{m}{n \cdot \mathbb{P}[CP] \cdot \mathbb{P}[\langle s_q, c \rangle = 0]}
@@ -261,12 +256,12 @@ where the event CP means a usable cache access pattern for a coordinate of $y$.
 	\caption{Experimental results of an attack on BLISS with CDT sampling using a perfect side channel and various parameter sets}
 	\label{tab:cdtperfect}
 \end{table}
-We can see from the results in table \ref{tab:cdtperfect}, that the average number of signatures $\bar{N}$ needed to collect m usable columns depends more on the paramter $\sigma$ and not much on $n$, because the number of usable cache weaknesses varies with that value QUELLE. The experimental results show a much better succes probabilty $p_{success}$ for a small increase of $m$, so an attacker can reach probabilities close to $1.0$, if e simply collects enough usable signatures (\cite{cryptoeprint:2016:300} suggests picking $m \simeq 2n$). 
+We can see from the results in table \ref{tab:cdtperfect}, that the average number of signatures $\bar{N}$ needed to collect m usable columns depends more on the parameter $\sigma$ and not much on $n$, because the number of usable cache weaknesses varies with that value QUELLE. The experimental results show a much better success probability $p_{success}$ for a small increase of $m$, so an attacker can reach probabilities close to $1.0$, if e simply collects enough usable signatures (\cite{cryptoeprint:2016:300} suggests picking $m \simeq 2n$). 
 
 
 \newpage
 \subsection{Perfect Side Channel Attack on Rejection Sampling}
-The perfect side channel tells the attacker, if there was an table look-up in the table $ET$. The attack explained  in section \ref{rejection} can be applied and requires $m = n$ challenges $c_i$ for the kernel calculation, because no randomization is needed. By checking the cache lines of the small part of the table, the attacker can learn if any element has been accessed in $ET$. Only 100 experiments were performed  in \cite{cryptoeprint:2016:300}, because for all parameter sets $p_{success} = 1.0$ holds.
+The perfect side channel tells the attacker, if there was an table look-up in the table $ET$. The attack explained in section \ref{rejection} can be applied and requires $m = n$ challenges $c_i$ for the kernel calculation, because no randomization is needed. By checking the cache lines of the small part of the table, the attacker can learn if any element has been accessed in $ET$. Only 100 experiments were performed in \cite{cryptoeprint:2016:300}, because for all parameter sets $p_{success} = 1.0$ holds.
 
 The expected numbers of signatures needed is:
 \begin{equation*}
@@ -292,12 +287,12 @@ with $K= \lfloor \frac{\sigma}{\sigma_2}+1\rfloor$ and tail-cut $r\ge 1$. The av
 The experiments explained above used a perfect side channel to get every memory information needed to perform the attack. In the following the proof of concept implementation using a realistic FLUSH+RELOAD attack from \cite{cryptoeprint:2016:300} will be summarized.
 \subsection{Attacking CDT Sampling}
 Because of various CPU optimizations, like prefetchers, real world implementations cannot assume to have perfectly aligned cache lines or that every loaded cache line was accessed. The \textit{spatial prefetcher} for example pairs two adjacent lines and loads both, if one is accessed. Because this might lead to false positives, only cache weaknesses spanning two unpaired lines can be exploited. \\
-The \verb|clflush| instruction is used to flush the monitored cache lines before every $y_i$ is sampled and the access time is measured afterwards. Compared to a reference loadtime, we can determine if an access happened. For simplicity, only one observed cache weakness was monitored in the experiments.\\
+The \verb|clflush| instruction is used to flush the monitored cache lines before every $y_i$ is sampled and the access time is measured afterwards. Compared to a reference load time, we can determine if an access happened. For simplicity, only one observed cache weakness was monitored in the experiments.\\
 Using an Intel i5-3470 processor, 50 attacks on the last-jump weakness $\{\gamma_1, \gamma_2\} = \{55,56\}$ in BLISS-I were performed an it was possible to recover the private key 46 times. To collect the recommended $m = 2n = 1024$ usable equations, on average $3438$ signatures were needed. Only 5 runs of LLL were performed, still a success rate of $92\%$ shows feasibility of the attack. This might vary with different CPUs, because of different prefetchers.
 \subsection{Attacking Rejection Sampling}
 Because the attack on rejection sampling only needs to know, if $ET$ was accessed at all and the spatial prefetcher, who will reload odd cache lines if the even ones are accessed, flushing all cache lines and reloading only the even ones, covers the whole table $ET$. Randomization, like in CDT, was needed in this case, because the side channel was not a perfect one and some columns $\langle s, c_i \rangle \neq 0$ in L were likely collected. So again, more than n columns were collected an LLL was used to handle the errors. 
-With an Intel i7-5650U again 50 attacks against BLISS-I were performed and 3 out of 6 cache lines were monitored. The private key could be recovered 44 times, while on average 3294 signatures wre needed to collect $m = n +100 = 612$ equations. LLL was performed 5 times, similar to the CDT attack.
+With an Intel i7-5650U again 50 attacks against BLISS-I were performed and 3 out of 6 cache lines were monitored. The private key could be recovered 44 times, while on average 3294 signatures were needed to collect $m = n +100 = 612$ equations. LLL was performed 5 times, similar to the CDT attack.
 \section{Evaluation}
 As we can see above, the Gaussian Samplers are vulnerable to side channel attacks and especially the FLUSH+RELOAD cache attack is a strong attack vector. Even in a realistic experiment it was possible to compute the private key in many cases, just by monitoring the CPU cache state before and after the signature. The number of signatures needed was not very high either. Access to the systems scheduler will even reduce this number significantly.
 
-This leads to the conclusion, that even fast and reliable gaussian sampling algorithms should be used with care, because an attacker with some kind of access to the processor can break the cryptosystem, even without access to the signature process itself. Masking is one way to reduce the risk of being successful attacked and even choosing different values for the target discrete gaussian distribution may help to avoid such an attack. 
+This leads to the conclusion, that even fast and reliable Gaussian sampling algorithms should be used with care, because an attacker with some kind of access to the processor can break the cryptosystem, even without access to the signature process itself. Masking is one way to reduce the risk of being successful attacked and even choosing different values for the target discrete Gaussian distribution may help to avoid such an attack.
