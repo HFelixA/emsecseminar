@@ -6,7 +6,7 @@
 \label{bliss}
 
 \section{Gaussian Sampling} %Eventuell zur Theorie
-
+The Gaussian Sampler is an important part for the security of many lattice based cryptosystems, because it is used to generate important random values. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. In this chapter we will introduce two different Gaussian Samplers and evaluate side channel attacks as described in \cite{cryptoeprint:2016:300}.
 \subsection{CDT Sampling}
 Using the cumulative distribution function in the sampler, we build a large table, in which we approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ Bits of precision. At sampling time, we generate a uniformly random $r \in [0,1)$ and perform a binary search in the table to locate $y \in [-r\sigma, r\sigma]$, so $r \in [p_{y-1}, p_y)$. If restricted to the non-negative part $[0, r\sigma]$, the probabilities are $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling is still $r \in [0,1)$, but $y \in [0, r \sigma]$ is located. 
 
@@ -141,7 +141,6 @@ Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \ga
 
 Because this last step is not always successful, not only $n$ but $m>n$ vectors $\xi_k$ are collected and a random subset forms the input for LLL.
 
-ALGORITHMUS EINRÜCKUNGEN
 \begin{algorithm}
 	\caption{Cache attack on BLISS with CDT Sampling}
 	\label{algcdtattack}
@@ -175,7 +174,6 @@ Depending on the bit $i$ of input $x$, $ET[i]$ is accessed, if $x = 0$, no table
 
 So the attacker knows the coefficients $y_i \in \{0, \pm K, \pm 2K,...\}, i \in \{0,...,n-1\}$ of the noise polynomial y. Because anyone can check if $max|\langle s,c \rangle |\le \kappa < K$ with the public parameters, $y_i$ can be determined completely with the signature vector $z$. With $N$ more signatures $(z_j, c_j), j =1,...,N$, the attacker can search for  $y_{ji} \in \{0, \pm K, \pm 2K,...\}$ ($y_{ji}$ means the ith coefficient of $y_j$). If the attacker additionally sees, that $z_{ji} = y_{ji}$, he knows $\langle s, c_{ji} \rangle = 0$. Such vector is a \textit{good vector} for use in the attack and $\zeta _k = c_{ji}$ is saved for later (some known $y_{ji}$ will be discarded, if they dont satisfy the necessary requirements). With $n$ of these vectors $\xi _k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1\le k \le n$ a matrix $L \in \{-1,0,1\}^{nxn}$ can be formed. The column vectors $\xi_k$ satisfy $sL = 0$ (0 is the all-zero vector) and most likely the only dependency of $\xi_k$ is introduced by s, so s is the only kernel vector. There is no need to randomize this process, because the all-zero vector is used.
 
-EINRÜCKUNGEN NEU
 \begin{algorithm}
 	\caption{Cache attack on BLISS with Rejection Sampling}
 	\label{algrctattack}
@@ -208,11 +206,9 @@ To fulfill this requirements, the authors of \cite{cryptoeprint:2016:300} modifi
 \subsection{Perfect Side Channel Attack on CDT Sampling}
 A perfect side channel yields the attacker the values $\lfloor u/8 \rfloor$ and $\lfloor I_z/8 \rfloor$ of the table accesses for $I[u]$ and $T[I_z]$, the full cache line for a specific value. 
 
-EINSCHRÄNKUNGEN DER PARAMETER
+Because not every cache line contains a intersection or last-jump weakness, a one-time brute force search over the look-up tables reveals cache lines, which are exploitable, by analyzing the structure and applying the biased restriction $\alpha \le 0.1$
 
-
-
-For each BLISS parameter set at least one usable cache weakness was found, which could be abused. 
+For each BLISS parameter set at least one usable cache weakness can be found, which can be abused. 
 The attacker then collects $m$ coefficient vectors $c_j$ and runs LLL up to $t = 2(m-n)+1$ times searching for s. A bigger value $t$ is not likely to have better success probabilities, because the randomly constructed lattices have overlapping base vectors, so the authors of the paper considered a experiment failed after this number of tries. Each experiment (with different parameters and different sizes of $m$) was performed 1000 times to measure the success probability $p_{successs}$, the average number of required signatures $\bar{N}$ to get $m$ usable challenges and the average length of $v$, if one was found.
 The expected number of needed signatures is:
 \begin{equation*}
@@ -302,3 +298,6 @@ Using an Intel i5-3470 processor, 50 attacks on the last-jump weakness $\{\gamma
 Because the attack on rejection sampling only needs to know, if $ET$ was accessed at all and the spatial prefetcher, who will reload odd cache lines if the even ones are accessed, flushing all cache lines and reloading only the even ones, covers the whole table $ET$. Randomization, like in CDT, was needed in this case, because the side channel was not a perfect one and some columns $\langle s, c_i \rangle \neq 0$ in L were likely collected. So again, more than n columns were collected an LLL was used to handle the errors. 
 With an Intel i7-5650U again 50 attacks against BLISS-I were performed and 3 out of 6 cache lines were monitored. The private key could be recovered 44 times, while on average 3294 signatures wre needed to collect $m = n +100 = 612$ equations. LLL was performed 5 times, similar to the CDT attack.
 \section{Evaluation}
+As we can see above, the Gaussian Samplers are vulnerable to side channel attacks and especially the FLUSH+RELOAD cache attack is a strong attack vector. Even in a realistic experiment it was possible to compute the private key in many cases, just by monitoring the CPU cache state before and after the signature. The number of signatures needed was not very high either. Access to the systems scheduler will even reduce this number significantly.
+
+This leads to the conclusion, that even fast and reliable gaussian sampling algorithms should be used with care, because an attacker with some kind of access to the processor can break the cryptosystem, even without access to the signature process itself. Masking is one way to reduce the risk of being successful attacked and even choosing different values for the target discrete gaussian distribution may help to avoid such an attack. 
