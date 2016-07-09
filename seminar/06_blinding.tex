@@ -44,10 +44,6 @@ In the following, a function \(\textsc{VectorSample}(n,\sigma)\) is defined that
 
 The first approach to blinding would be to randomly shuffle the elements in the coefficient vector. The function \(\textsc{VectorShuffle}(\vec{x})\) is doing exactly that, so that \(\textsc{VectorShuffle}(\textsc{VectorSample}(n,\sigma))\) would increase security to a certain extend. For the second approach we need to take a short detour through probability theory. For two Gaussian distributions \(X=\mathcal{N}_\mathbb{Z}^{n} (\mu_X, \sigma^2_X)\) and \(Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_Y, \sigma^2_Y)\) it holds that their sum is equal to \(X+Y=\mathcal{N}_\mathbb{Z}^{n} (\mu_X+\mu_Y, \sigma^2_X+\sigma^2_Y)\). As we focus on zero-centered distributions, the center does not change for us. For the standard deviation it follows, that \(\sigma_{X+Y}=\sqrt{\sigma^2_x+\sigma^2_Y}\). Algorithm \ref{alg:VectorBlindSample} is one possible way to make use of those characteristics of Gaussian distributions. It also makes use of the \(\textsc{VectorShuffle}(\vec{x})\) function to increase overall security. Another, very similar approach, has been described in \cite{cryptoeprint:2014:254}.
 
-%#############
-%evtl noch weiter ausführen, je nachdem wie viele Seiten wir am Ende noch vollkriegen müssen
-%#############
-
 \begin{algorithm}
     \caption{\textsc{VectorBlindSample}}
     \label{alg:VectorBlindSample}
