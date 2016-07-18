@@ -3,7 +3,7 @@
 
 \section{Gaussian Sampling}
 The Gaussian sampler is an important part for the security of many lattice based cryptosystems. This task is essential for the security of the cipher or signature, so the sampler is likely target of an attacker. There are many papers dealing with various ways of discrete Gaussian sampling such as \cite{cryptoeprint:2010:088}, but in this chapter we will introduce the two different Gaussian samplers and side-channel attacks as described in \cite{cryptoeprint:2016:300}.
-\subsection{CDT Sampling}
+\subsection{\acs{CDT} Sampling}
 Using the cumulative distribution function, a large table is built, to approximate the probabilities $p_y=\mathbb{P}[x \le y| x \leftarrow D_\sigma ]$ with $\lambda$ bits of precision. At sampling time, a uniformly random $r \in [0,1)$ is generated and a binary search in the table is performed to locate $y \in [-\tau\sigma, \tau\sigma]$, so $r \in [p_{y-1}, p_y)$. The probabilities $p^*_y = \mathbb{P}[|x| \le y| x \leftarrow D_\sigma]$, sampling $r \in [0,1)$ and locating $y \in [0, \tau \sigma]$ correspond to a restriction on the non-negative part $[0, \tau\sigma]$.
 
 The binary search in this sampling method can take some time, so one can speed it up by using an additional \textit{guide table I}. This table stores for example 256 entries consisting of intervals $I[u] = (a_u, b_u), u \in \{0,...255\}$ such that $p^*_{a_{u}} \le u/256$ and $p^*_{b_{u}} \ge (u+1)/256$. At sampling time, the first byte of $r$ is then used to select the corresponding $I[u]$, which leads to a smaller interval to binary search. $r$ is effectively picked byte-by-byte using the guide table approach. Algorithm \ref{algcdtwtable} summarizes the guide table approach.
@@ -132,7 +132,7 @@ The victim then has to generate $N$ signatures $(z_j, c_j), j= 1,...,N$, which a
 \begin{equation*}
 	z_{ji} = y_{ji} + (-1)^{b_j}\langle s,c_ji \rangle
 \end{equation*}
-Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \gamma_1}$, the attacker adds $\xi_k = c_{ji}$ to a list of good vectors. With enough vectors $\xi_k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1 \le k \le n$ the matrix $L \in \{-1,0,1\}^{n \times n}$ can be formed. The column vectors $\xi_k$ satisfy $sL = v$, where $v$ is a unknown, but short, vector with norm about $\sqrt{\alpha n}$ in the lattice spanned by the rows of $L$. A lattice reduction algorithm, like LLL, can search for $v$ and output a uni-modular matrix $U$ with $UL = L'$. Every row of $U$ (or its rotations) is tested if it is a candidate for $s=f$ by checking against the public key.
+Unknown values are $b_j$ and $s$. Because of restrictions above, if $z_{ji = \gamma_1}$, the attacker adds $\xi_k = c_{ji}$ to a list of good vectors. With enough vectors $\xi_k = c_{ji}; 0 \le i \le n-1, 1 \le j \le N, 1 \le k \le n$ the matrix $L \in \{-1,0,1\}^{n \times n}$ can be formed. The column vectors $\xi_k$ satisfy $sL = v$, where $v$ is a unknown, but short, vector with norm about $\sqrt{\alpha n}$ in the lattice spanned by the rows of $L$. A lattice reduction algorithm, like the \ac{LLL} algorithm, can search for $v$ and output a uni-modular matrix $U$ with $UL = L'$. Every row of $U$ (or its rotations) is tested if it is a candidate for $s=f$ by checking against the public key.
 
 Because this last step is not always successful, not only $n$ but $m>n$ vectors $\xi_k$ are collected and a random subset forms the input for LLL.
 
